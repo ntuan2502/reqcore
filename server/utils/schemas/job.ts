@@ -41,5 +41,5 @@ export const JOB_STATUS_TRANSITIONS: Record<string, string[]> = {
   draft: ['open', 'archived'],
   open: ['closed', 'archived'],
   closed: ['open', 'archived'],
-  archived: [],
+  archived: ['draft', 'open'],
 }

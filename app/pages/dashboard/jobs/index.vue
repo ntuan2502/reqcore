@@ -61,7 +61,7 @@ const typeLabels: Record<string, string> = {
       <button
         v-for="tab in statusTabs"
         :key="tab.label"
-        class="px-3 py-2 text-sm font-medium transition-colors border-b-2 -mb-px"
+        class="cursor-pointer px-3 py-2 text-sm font-medium transition-colors border-b-2 -mb-px"
         :class="statusFilter === tab.value
           ? 'border-brand-600 text-brand-600'
           : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300'"

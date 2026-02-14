@@ -10,7 +10,11 @@ async function handleSwitch(orgId: string) {
   }
 
   isSwitching.value = true
-  await switchOrg(orgId)
+  try {
+    await switchOrg(orgId)
+  } catch {
+    isSwitching.value = false
+  }
 }
 
 /** Close dropdown on outside click */

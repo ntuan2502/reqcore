@@ -28,7 +28,9 @@ export function useCurrentOrg() {
    */
   async function switchOrg(orgId: string) {
     await authClient.organization.setActive({ organizationId: orgId })
-    reloadNuxtApp()
+    // Hard navigation ensures all component state is fully reset.
+    // reloadNuxtApp() without force can soft-reload and leak stale state.
+    window.location.href = '/dashboard'
   }
 
   /**

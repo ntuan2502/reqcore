@@ -24,16 +24,18 @@ const JOB_STATUS_TRANSITIONS: Record<string, string[]> = {
   draft: ['open', 'archived'],
   open: ['closed', 'archived'],
   closed: ['open', 'archived'],
-  archived: [],
+  archived: ['draft', 'open'],
 }
 
 const transitionLabels: Record<string, string> = {
+  draft: 'Revert to Draft',
   open: 'Publish',
   closed: 'Close',
   archived: 'Archive',
 }
 
 const transitionClasses: Record<string, string> = {
+  draft: 'border border-surface-300 text-surface-600 hover:bg-surface-50',
   open: 'bg-success-600 text-white hover:bg-success-700',
   closed: 'bg-warning-600 text-white hover:bg-warning-700',
   archived: 'border border-surface-300 text-surface-600 hover:bg-surface-50',
