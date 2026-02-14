@@ -9,9 +9,9 @@
 
 ## 🎯 Current Focus
 
-**Phase 1, Milestone 5: Applications & Pipeline** — Link candidates to jobs, track through hiring stages.
+**Phase 1, Milestone 6: Document Storage** — Upload and manage resumes/cover letters via MinIO.
 
-> **Recently completed**: Milestone 4 (Candidate Management) — Full CRUD for candidates with deduplication, search, and application/document views.
+> **Recently completed**: Milestone 5 (Applications & Pipeline) — Full application CRUD, pipeline/Kanban view per job, status transition validation, and apply-candidate-to-job flow.
 
 ---
 
@@ -48,7 +48,7 @@ Users can sign up, sign in, create/switch orgs, and see an app shell.
 - [x] Organization switcher component (`app/components/OrgSwitcher.vue`)
 - [x] App layout with sidebar navigation (`app/layouts/dashboard.vue`)
 - [x] Auth layout for sign-in/sign-up forms (`app/layouts/auth.vue`)
-- [x] Sidebar component with nav and sign-out (`app/components/AppSidebar.vue`)
+- [x] Sidebar component with nav, icons, dynamic job context tabs, and sign-out (`app/components/AppSidebar.vue`)
 - [x] Current org composable (`app/composables/useCurrentOrg.ts`)
 - [x] Server-side auth guard utility (`server/utils/requireAuth.ts`)
 - [x] Root page placeholder (`app/pages/index.vue`) — later replaced by landing page (Milestone 2.5)
@@ -98,17 +98,28 @@ Full CRUD for candidates with deduplication.
 - [x] Page: Candidate detail (with applications & documents tabs)
 - [x] Page: Candidate creation form
 
-### Milestone 5: Applications & Pipeline (not started)
+### Milestone 5: Applications & Pipeline ✅
 
 Link candidates to jobs, track through hiring stages.
 
-- [ ] API: `GET /api/applications` — list (filterable by job, status)
-- [ ] API: `POST /api/applications` — create (link candidate → job)
-- [ ] API: `PATCH /api/applications/:id` — update status
-- [ ] Composable: `useApplications(filters)`
-- [ ] Pipeline/Kanban view per job (columns: new → screening → interview → offer → hired/rejected)
-- [ ] Status transition validation (define allowed transitions)
-- [ ] "Apply candidate to job" flow from both job and candidate detail pages
+- [x] API: `GET /api/applications` — list (filterable by job, status, candidate)
+- [x] API: `POST /api/applications` — create (link candidate → job)
+- [x] API: `GET /api/applications/:id` — application detail with candidate, job, and question responses
+- [x] API: `PATCH /api/applications/:id` — update status (with transition validation), notes, score
+- [x] Composable: `useApplications(filters)` — list + create mutation
+- [x] Composable: `useApplication(id)` — detail + update mutation
+- [x] Zod validation schemas (`server/utils/schemas/application.ts`)
+- [x] Status transition validation (define allowed transitions)
+- [x] Unique constraint on `(organizationId, candidateId, jobId)` to prevent duplicate applications
+- [x] Pipeline/Kanban view per job (`app/pages/dashboard/jobs/[id]/pipeline.vue`)
+- [x] Pipeline card component (`app/components/PipelineCard.vue`)
+- [x] Applications list page (`app/pages/dashboard/applications/index.vue`)
+- [x] Application detail page (`app/pages/dashboard/applications/[id].vue`)
+- [x] "Apply candidate to job" modal from job detail page (`ApplyCandidateModal.vue`)
+- [x] "Apply to job" modal from candidate detail page (`ApplyToJobModal.vue`)
+- [x] Sidebar Applications link enabled
+- [x] Public apply endpoint duplicate application check
+- [x] Job detail page restructured to `[id]/index.vue` for nested pipeline route
 
 ### Milestone 6: Document Storage (not started)
 
@@ -151,6 +162,8 @@ Recruiters can configure custom questions per job. Applicants can apply through 
 - [x] Layout: Public layout for unauthenticated pages (`app/layouts/public.vue`)
 - [x] Anti-spam: honeypot field on submission form
 - [x] Zod validation schemas for questions and public applications
+- [x] Application Form tab page (`app/pages/dashboard/jobs/[id]/application-form.vue`) — dedicated page for questions + shareable link
+- [x] Dynamic sidebar tabs for job sub-pages (Overview, Pipeline, Application Form)
 
 #### Sub-milestone 7b: Public Job Board ✅
 
@@ -242,6 +255,7 @@ Goal: Ready for real teams to self-host in production.
 | 7a. Custom Application Forms & Public Submission | 2026-02-14 |
 | 7b. Public Job Board | 2026-02-14 |
 | 4. Candidate Management | 2026-02-14 |
+| 5. Applications & Pipeline | 2026-02-14 |
 
 ---
 

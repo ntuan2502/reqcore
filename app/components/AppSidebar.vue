@@ -1,4 +1,10 @@
 <script setup lang="ts">
+import {
+  LayoutDashboard, Briefcase, Users, Inbox,
+  ChevronLeft, Eye, Kanban, FileText, LogOut,
+} from 'lucide-vue-next'
+
+const route = useRoute()
 const { data: session } = await authClient.useSession(useFetch)
 const isSigningOut = ref(false)
 
@@ -12,158 +18,109 @@ async function handleSignOut() {
 }
 
 const navItems = [
-  { label: 'Dashboard', to: '/dashboard', enabled: true },
-  { label: 'Jobs', to: '/dashboard/jobs', enabled: true },
-  { label: 'Candidates', to: '/dashboard/candidates', enabled: true },
-  { label: 'Applications', to: '/dashboard/applications', enabled: false },
+  { label: 'Dashboard', to: '/dashboard', icon: LayoutDashboard, exact: true },
+  { label: 'Jobs', to: '/dashboard/jobs', icon: Briefcase, exact: false },
+  { label: 'Candidates', to: '/dashboard/candidates', icon: Users, exact: false },
+  { label: 'Applications', to: '/dashboard/applications', icon: Inbox, exact: false },
 ]
+
+// ─────────────────────────────────────────────
+// Dynamic job context — detect when viewing a specific job
+// ─────────────────────────────────────────────
+
+const activeJobId = computed(() => {
+  const match = route.path.match(/^\/dashboard\/jobs\/([^/]+)/)
+  if (match && match[1] !== 'new') return match[1]
+  return null
+})
+
+const jobTabs = computed(() => {
+  if (!activeJobId.value) return []
+  const base = `/dashboard/jobs/${activeJobId.value}`
+  return [
+    { label: 'Overview', to: base, icon: Eye, exact: true },
+    { label: 'Pipeline', to: `${base}/pipeline`, icon: Kanban, exact: true },
+    { label: 'Application Form', to: `${base}/application-form`, icon: FileText, exact: true },
+  ]
+})
+
+function isActiveTab(to: string, exact: boolean) {
+  if (exact) return route.path === to
+  return route.path.startsWith(to)
+}
 </script>
 
 <template>
-  <aside class="sidebar">
-    <div class="sidebar-top">
-      <div class="sidebar-logo">Applirank</div>
+  <aside
+    class="flex flex-col justify-between w-60 min-w-60 bg-white border-r border-surface-200 py-5 px-3 overflow-y-auto"
+  >
+    <!-- Top -->
+    <div class="flex flex-col gap-5">
+      <!-- Logo -->
+      <div class="px-2 text-lg font-bold text-surface-900">Applirank</div>
 
-      <div class="sidebar-org">
+      <!-- Org Switcher -->
+      <div>
         <OrgSwitcher />
       </div>
 
-      <nav class="sidebar-nav">
-        <template v-for="item in navItems" :key="item.to">
-          <NuxtLink
-            v-if="item.enabled"
-            :to="item.to"
-            class="nav-link"
-            active-class="nav-link--active"
-          >
-            {{ item.label }}
-          </NuxtLink>
-          <span v-else class="nav-link nav-link--disabled">
-            {{ item.label }}
-          </span>
-        </template>
+      <!-- Main navigation -->
+      <nav class="flex flex-col gap-0.5">
+        <NuxtLink
+          v-for="item in navItems"
+          :key="item.to"
+          :to="item.to"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-surface-600 hover:bg-surface-100 hover:text-surface-900 transition-colors no-underline"
+          :class="isActiveTab(item.to, item.exact)
+            ? 'bg-brand-50 text-brand-700 font-medium'
+            : ''"
+        >
+          <component :is="item.icon" class="size-4 shrink-0" />
+          {{ item.label }}
+        </NuxtLink>
       </nav>
+
+      <!-- Job context sub-nav (when viewing a specific job) -->
+      <div v-if="activeJobId" class="border-t border-surface-200 pt-4">
+        <NuxtLink
+          to="/dashboard/jobs"
+          class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-surface-500 hover:text-surface-700 transition-colors no-underline mb-2"
+        >
+          <ChevronLeft class="size-3.5" />
+          All Jobs
+        </NuxtLink>
+
+        <nav class="flex flex-col gap-0.5">
+          <NuxtLink
+            v-for="tab in jobTabs"
+            :key="tab.to"
+            :to="tab.to"
+            class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-surface-600 hover:bg-surface-100 hover:text-surface-900 transition-colors no-underline"
+            :class="isActiveTab(tab.to, tab.exact)
+              ? 'bg-brand-50 text-brand-700 font-medium'
+              : ''"
+          >
+            <component :is="tab.icon" class="size-4 shrink-0" />
+            {{ tab.label }}
+          </NuxtLink>
+        </nav>
+      </div>
     </div>
 
-    <div class="sidebar-bottom">
-      <div class="sidebar-user">
-        <div class="user-name">{{ userName }}</div>
-        <div class="user-email">{{ userEmail }}</div>
+    <!-- Bottom -->
+    <div class="border-t border-surface-200 pt-4 flex flex-col gap-3">
+      <div class="px-2">
+        <div class="text-sm font-medium text-surface-900">{{ userName }}</div>
+        <div class="text-xs text-surface-500 truncate">{{ userEmail }}</div>
       </div>
-      <button class="sign-out-button" :disabled="isSigningOut" @click="handleSignOut">
+      <button
+        class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-surface-600 hover:bg-surface-100 hover:text-surface-900 transition-colors cursor-pointer border-0 bg-transparent w-full text-left disabled:opacity-50 disabled:cursor-not-allowed"
+        :disabled="isSigningOut"
+        @click="handleSignOut"
+      >
+        <LogOut class="size-4 shrink-0" />
         {{ isSigningOut ? 'Signing out…' : 'Sign out' }}
       </button>
     </div>
   </aside>
 </template>
-
-<style scoped>
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  width: 240px;
-  min-width: 240px;
-  background: #fff;
-  border-right: 1px solid #e5e7eb;
-  padding: 1.25rem 0.75rem;
-  overflow-y: auto;
-}
-
-.sidebar-top {
-  display: flex;
-  flex-direction: column;
-  gap: 1.25rem;
-}
-
-.sidebar-logo {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #111;
-  padding: 0 0.5rem;
-}
-
-.sidebar-org {
-  padding: 0;
-}
-
-.sidebar-nav {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.nav-link {
-  display: block;
-  padding: 0.5rem 0.75rem;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  color: #374151;
-  text-decoration: none;
-  transition: background 0.1s;
-}
-
-.nav-link:hover {
-  background: #f3f4f6;
-}
-
-.nav-link--active {
-  background: #eff6ff;
-  color: #2563eb;
-  font-weight: 500;
-}
-
-.nav-link--disabled {
-  color: #9ca3af;
-  cursor: not-allowed;
-}
-
-.nav-link--disabled:hover {
-  background: none;
-}
-
-.sidebar-bottom {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e5e7eb;
-}
-
-.sidebar-user {
-  padding: 0 0.5rem;
-}
-
-.user-name {
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #111;
-}
-
-.user-email {
-  font-size: 0.75rem;
-  color: #6b7280;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.sign-out-button {
-  padding: 0.375rem 0.75rem;
-  background: none;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.8125rem;
-  color: #374151;
-  cursor: pointer;
-}
-
-.sign-out-button:hover:not(:disabled) {
-  background: #f9fafb;
-}
-
-.sign-out-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-</style>

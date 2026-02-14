@@ -76,7 +76,7 @@ const typeOptions = [
 </script>
 
 <template>
-  <div class="max-w-2xl">
+  <div class="mx-auto max-w-2xl">
     <!-- Back link -->
     <NuxtLink
       to="/dashboard/jobs"

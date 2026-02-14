@@ -103,7 +103,24 @@ export default defineEventHandler(async (event) => {
     candidateId = created!.id
   }
 
-  // 4. Create application
+  // 4. Check for duplicate application (same candidate + same job)
+  const existingApplication = await db.query.application.findFirst({
+    where: and(
+      eq(application.organizationId, orgId),
+      eq(application.candidateId, candidateId),
+      eq(application.jobId, jobId),
+    ),
+    columns: { id: true },
+  })
+
+  if (existingApplication) {
+    throw createError({
+      statusCode: 409,
+      statusMessage: 'You have already applied to this position',
+    })
+  }
+
+  // 5. Create application
   const [newApplication] = await db.insert(application).values({
     organizationId: orgId,
     candidateId,
@@ -111,7 +128,7 @@ export default defineEventHandler(async (event) => {
     status: 'new',
   }).returning({ id: application.id })
 
-  // 5. Store question responses
+  // 6. Store question responses
   if (validResponses.length > 0) {
     await db.insert(questionResponse).values(
       validResponses.map((r) => ({

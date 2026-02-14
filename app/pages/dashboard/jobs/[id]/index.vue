@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeft, Pencil, Trash2, MapPin, Clock, Calendar, Link2, ClipboardCopy, FileText } from 'lucide-vue-next'
+import { Pencil, Trash2, MapPin, Clock, Calendar, UserPlus } from 'lucide-vue-next'
 import { z } from 'zod'
 
 definePageMeta({
@@ -10,7 +10,7 @@ definePageMeta({
 const route = useRoute()
 const jobId = route.params.id as string
 
-const { job, status: fetchStatus, error, updateJob, deleteJob } = useJob(jobId)
+const { job, status: fetchStatus, error, refresh, updateJob, deleteJob } = useJob(jobId)
 
 useSeoMeta({
   title: computed(() => job.value ? `${job.value.title} — Applirank` : 'Job — Applirank'),
@@ -161,48 +161,27 @@ const typeLabels: Record<string, string> = {
   internship: 'Internship',
 }
 
-// ─────────────────────────────────────────────
-// Application link
-// ─────────────────────────────────────────────
-
-const requestUrl = useRequestURL()
-const applicationUrl = computed(() => {
-  const base = `${requestUrl.protocol}//${requestUrl.host}`
-  return `${base}/jobs/${job.value?.slug ?? jobId}/apply`
-})
-
-const linkCopied = ref(false)
-
-async function copyApplicationLink() {
-  try {
-    await navigator.clipboard.writeText(applicationUrl.value)
-    linkCopied.value = true
-    setTimeout(() => { linkCopied.value = false }, 2000)
-  } catch {
-    // Fallback for non-HTTPS contexts
-    alert(applicationUrl.value)
-  }
-}
-
 const typeOptions = [
   { value: 'full_time', label: 'Full-time' },
   { value: 'part_time', label: 'Part-time' },
   { value: 'contract', label: 'Contract' },
   { value: 'internship', label: 'Internship' },
 ]
+
+// ─────────────────────────────────────────────
+// Apply candidate modal
+// ─────────────────────────────────────────────
+
+const showApplyModal = ref(false)
+
+function handleCandidateApplied() {
+  showApplyModal.value = false
+  refresh()
+}
 </script>
 
 <template>
-  <div class="max-w-3xl">
-    <!-- Back link -->
-    <NuxtLink
-      to="/dashboard/jobs"
-      class="inline-flex items-center gap-1 text-sm text-surface-500 hover:text-surface-700 mb-6 transition-colors"
-    >
-      <ArrowLeft class="size-4" />
-      Back to Jobs
-    </NuxtLink>
-
+  <div class="mx-auto max-w-3xl">
     <!-- Loading -->
     <div v-if="fetchStatus === 'pending'" class="text-center py-12 text-surface-400">
       Loading job…
@@ -311,54 +290,34 @@ const typeOptions = [
           </dl>
         </div>
 
-        <!-- Applications count -->
+        <!-- Applications summary -->
         <div class="rounded-lg border border-surface-200 bg-white p-5 mb-4">
-          <h2 class="text-sm font-semibold text-surface-700 mb-1">Applications</h2>
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="text-sm font-semibold text-surface-700">Applications</h2>
+            <button
+              class="inline-flex items-center gap-1.5 rounded-lg border border-surface-300 px-3 py-1.5 text-sm font-medium text-surface-700 hover:bg-surface-50 transition-colors"
+              @click="showApplyModal = true"
+            >
+              <UserPlus class="size-3.5" />
+              Add Candidate
+            </button>
+          </div>
           <p class="text-2xl font-bold text-surface-900">
             {{ job.applications?.length ?? 0 }}
           </p>
           <p class="text-xs text-surface-400 mt-1">
-            Application management coming in a future milestone.
+            Candidates in the hiring pipeline for this position.
           </p>
         </div>
 
-        <!-- Shareable application link (only when job is open) -->
-        <div v-if="job.status === 'open'" class="rounded-lg border border-brand-200 bg-brand-50 p-5 mb-4">
-          <div class="flex items-center gap-2 mb-2">
-            <Link2 class="size-4 text-brand-600" />
-            <h2 class="text-sm font-semibold text-brand-700">Application Link</h2>
-          </div>
-          <p class="text-xs text-surface-600 mb-3">
-            Share this link with candidates so they can apply to this position.
-          </p>
-          <div class="flex items-center gap-2">
-            <input
-              type="text"
-              readonly
-              :value="applicationUrl"
-              class="flex-1 rounded-lg border border-brand-200 bg-white px-3 py-1.5 text-sm text-surface-700 select-all"
-            />
-            <button
-              class="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700 transition-colors"
-              @click="copyApplicationLink"
-            >
-              <ClipboardCopy class="size-3.5" />
-              {{ linkCopied ? 'Copied!' : 'Copy' }}
-            </button>
-          </div>
-        </div>
+        <!-- Apply Candidate Modal -->
+        <ApplyCandidateModal
+          v-if="showApplyModal"
+          :job-id="jobId"
+          @close="showApplyModal = false"
+          @created="handleCandidateApplied"
+        />
 
-        <!-- Application Form Questions -->
-        <div class="rounded-lg border border-surface-200 bg-white p-5">
-          <div class="flex items-center gap-2 mb-3">
-            <FileText class="size-4 text-surface-500" />
-            <h2 class="text-sm font-semibold text-surface-700">Application Form Questions</h2>
-          </div>
-          <p class="text-xs text-surface-400 mb-4">
-            Customize the questions applicants must answer when applying. All applications include name, email, and phone by default.
-          </p>
-          <JobQuestions :job-id="jobId" />
-        </div>
       </div>
 
       <!-- EDIT MODE -->

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ArrowLeft, Pencil, Trash2, Mail, Phone, Calendar, Clock, Briefcase, FileText } from 'lucide-vue-next'
+import { ArrowLeft, Pencil, Trash2, Mail, Phone, Calendar, Clock, Briefcase, FileText, Plus } from 'lucide-vue-next'
 import { z } from 'zod'
 
 definePageMeta({
@@ -10,7 +10,7 @@ definePageMeta({
 const route = useRoute()
 const candidateId = route.params.id as string
 
-const { candidate, status: fetchStatus, error, updateCandidate, deleteCandidate } = useCandidate(candidateId)
+const { candidate, status: fetchStatus, error, refresh, updateCandidate, deleteCandidate } = useCandidate(candidateId)
 
 useSeoMeta({
   title: computed(() =>
@@ -133,10 +133,21 @@ const documentTypeLabels: Record<string, string> = {
   cover_letter: 'Cover Letter',
   other: 'Other',
 }
+
+// ─────────────────────────────────────────────
+// Apply to job modal
+// ─────────────────────────────────────────────
+
+const showApplyModal = ref(false)
+
+function handleApplied() {
+  showApplyModal.value = false
+  refresh()
+}
 </script>
 
 <template>
-  <div class="max-w-3xl">
+  <div class="mx-auto max-w-3xl">
     <!-- Back link -->
     <NuxtLink
       to="/dashboard/candidates"
@@ -261,6 +272,17 @@ const documentTypeLabels: Record<string, string> = {
 
         <!-- Applications tab -->
         <div v-if="activeTab === 'applications'">
+          <!-- Apply to Job button -->
+          <div class="flex justify-end mb-3">
+            <button
+              class="inline-flex items-center gap-1.5 rounded-lg border border-surface-300 dark:border-surface-600 px-3 py-1.5 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+              @click="showApplyModal = true"
+            >
+              <Plus class="size-3.5" />
+              Apply to Job
+            </button>
+          </div>
+
           <div
             v-if="!candidate.applications?.length"
             class="rounded-lg border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 p-8 text-center"
@@ -273,7 +295,7 @@ const documentTypeLabels: Record<string, string> = {
             <NuxtLink
               v-for="app in candidate.applications"
               :key="app.id"
-              :to="`/dashboard/jobs/${app.job.id}`"
+              :to="`/dashboard/applications/${app.id}`"
               class="flex items-center justify-between rounded-lg border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 px-4 py-3 hover:border-surface-300 dark:hover:border-surface-700 hover:shadow-sm transition-all group"
             >
               <div class="min-w-0 flex-1">
@@ -293,6 +315,14 @@ const documentTypeLabels: Record<string, string> = {
             </NuxtLink>
           </div>
         </div>
+
+        <!-- Apply to Job Modal -->
+        <ApplyToJobModal
+          v-if="showApplyModal"
+          :candidate-id="candidateId"
+          @close="showApplyModal = false"
+          @created="handleApplied"
+        />
 
         <!-- Documents tab -->
         <div v-if="activeTab === 'documents'">

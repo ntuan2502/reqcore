@@ -22,6 +22,13 @@
       "when": 1771089588253,
       "tag": "0002_kind_inertia",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1771094430857,
+      "tag": "0003_slim_clea",
+      "breakpoints": true
     }
   ]
 }

@@ -430,10 +430,20 @@ app/pages/
 │   └── sign-up.vue         → /auth/sign-up
 ├── dashboard/
 │   ├── index.vue           → /dashboard
+│   ├── candidates/
+│   │   ├── index.vue       → /dashboard/candidates
+│   │   ├── new.vue         → /dashboard/candidates/new
+│   │   └── [id].vue        → /dashboard/candidates/:id
+│   ├── applications/
+│   │   ├── index.vue       → /dashboard/applications
+│   │   └── [id].vue        → /dashboard/applications/:id
 │   └── jobs/
-│       ├── index.vue       → /dashboard/jobs
+│       ├── index.vue       → /dashboard/jobs           (list/gallery view)
 │       ├── new.vue         → /dashboard/jobs/new
-│       └── [id].vue        → /dashboard/jobs/:id
+│       └── [id]/
+│           ├── index.vue           → /dashboard/jobs/:id              (overview, edit, delete)
+│           ├── pipeline.vue        → /dashboard/jobs/:id/pipeline     (Kanban board, full width)
+│           └── application-form.vue→ /dashboard/jobs/:id/application-form (questions + link)
 ├── jobs/                                     (public job board — no auth, `public` layout)
 │   ├── index.vue           → /jobs           (browse open positions)
 │   └── [slug]/
@@ -492,7 +502,7 @@ if (error.value) {
 app/layouts/
 ├── default.vue      # Default (landing, login)
 ├── auth.vue         # Auth pages (sign-in, sign-up) — centered card layout
-├── dashboard.vue    # Authenticated app shell (sidebar, header)
+├── dashboard.vue    # Authenticated app shell (sidebar + full-width main area)
 └── public.vue       # Public-facing pages (job board, apply form) — simple header/footer
 ```
 
@@ -505,16 +515,28 @@ const { data: session } = await authClient.useSession(useFetch)
 </script>
 
 <template>
-  <div class="flex h-screen">
-    <aside class="w-64 border-r">
-      <!-- Sidebar navigation -->
-    </aside>
-    <main class="flex-1 overflow-auto">
+  <div class="flex min-h-screen">
+    <AppSidebar />
+    <main class="flex-1 overflow-y-auto bg-surface-50 px-6 py-8">
       <slot />
     </main>
   </div>
 </template>
 ```
+
+The dashboard layout provides only the sidebar + a full-width `<main>` area. **Each page controls its own width**:
+- Content pages: `<div class="mx-auto max-w-3xl">` or `mx-auto max-w-4xl`
+- Full-width pages (e.g., pipeline Kanban): no `max-w-*` constraint
+- **Always include `mx-auto`** alongside `max-w-*` for centering
+
+### Sidebar — Dynamic Job Context
+
+The `AppSidebar` component auto-detects when the route matches `/dashboard/jobs/:id/*` and shows contextual tabs:
+- **Overview** → `/dashboard/jobs/:id`
+- **Pipeline** → `/dashboard/jobs/:id/pipeline`
+- **Application Form** → `/dashboard/jobs/:id/application-form`
+
+Job sub-pages should NOT include "Back to X" links — the sidebar provides all navigation.
 
 Set layout per page with `definePageMeta({ layout: 'dashboard' })`.
 

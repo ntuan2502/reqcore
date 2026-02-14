@@ -83,6 +83,7 @@ export const application = pgTable('application', {
   index('application_organization_id_idx').on(t.organizationId),
   index('application_candidate_id_idx').on(t.candidateId),
   index('application_job_id_idx').on(t.jobId),
+  uniqueIndex('application_org_candidate_job_idx').on(t.organizationId, t.candidateId, t.jobId),
 ]))
 
 /**

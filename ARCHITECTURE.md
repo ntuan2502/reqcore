@@ -28,10 +28,20 @@ applirank/
 │   ├── assets/
 │   │   └── css/main.css           # Tailwind CSS entry point + @theme tokens
 │   ├── components/               # Auto-imported Vue components
+│   │   └── AppSidebar.vue        # Main sidebar with dynamic job context nav
 │   ├── composables/              # Auto-imported composables (useXxx)
 │   ├── layouts/                  # Layout components
+│   │   ├── dashboard.vue         # Sidebar + full-width main (pages set own max-w + mx-auto)
+│   │   ├── auth.vue              # Centered card for sign-in/sign-up
+│   │   └── public.vue            # Simple header/footer for public pages
 │   ├── middleware/                # Client-side route middleware
 │   ├── pages/                    # File-based routing
+│   │   ├── dashboard/
+│   │   │   └── jobs/
+│   │   │       └── [id]/
+│   │   │           ├── index.vue          # Job overview
+│   │   │           ├── pipeline.vue       # Kanban board (full width)
+│   │   │           └── application-form.vue # Questions + shareable link
 │   ├── plugins/                  # Client-side Nuxt plugins
 │   └── utils/                    # Auto-imported utilities
 │       └── auth-client.ts        # Better Auth Vue client

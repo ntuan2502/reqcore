@@ -10,6 +10,31 @@ Format follows [Keep a Changelog](https://keepachangelog.com). Categories: **Add
 
 ### Added
 
+- **Dynamic sidebar job tabs** — when viewing a specific job (`/dashboard/jobs/:id/*`), the sidebar shows contextual sub-navigation: Overview, Pipeline, Application Form
+- **Application Form tab page** (`app/pages/dashboard/jobs/[id]/application-form.vue`) — dedicated page for custom questions management and shareable application link
+- **Sidebar icons** — all main nav items now display Lucide icons (LayoutDashboard, Briefcase, Users, Inbox, LogOut)
+- **"All Jobs" sidebar back-link** — quick return to jobs list from any job sub-page
+
+### Changed
+
+- **Sidebar redesign** — replaced scoped CSS with Tailwind utility classes; added dynamic job context section with tab-based navigation
+- **Dashboard layout** — removed `max-w-4xl` wrapper from `dashboard.vue`; each page now controls its own `mx-auto max-w-*` for proper centering
+- **All dashboard pages** — added `mx-auto` to root elements for centered content within the main area
+- **Dashboard index** — converted from `<style scoped>` to Tailwind utility classes
+- **Job detail page** — removed "Back to Jobs" link, "View Pipeline" button, application link section, and Application Form Questions section (all moved to sidebar tabs / dedicated application-form page)
+- **Pipeline page** — removed "Back to Job" link (sidebar provides navigation)
+
+### Removed
+
+- **"Back to X" links** on job sub-pages — sidebar now provides all navigation context
+- **Scoped CSS** in `AppSidebar.vue` and `dashboard/index.vue` — replaced with Tailwind utilities
+
+---
+
+## 2026-02-14
+
+### Added
+
 - **SEO-friendly job slugs** — public job URLs now use human-readable slugs instead of UUIDs (e.g. `/jobs/senior-software-engineer-a1b2c3d4` instead of `/jobs/a1b2c3d4-...`)
 - **Custom slug support** — recruiters can optionally set a custom slug when creating or editing a job; defaults to auto-generated from job title
 - **Slug utility** — `server/utils/slugify.ts` with `generateJobSlug(title, id, customSlug?)` function, auto-imported by Nitro

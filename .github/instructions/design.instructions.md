@@ -168,8 +168,29 @@ Dashboard and form pages use the semantic `@theme` tokens from `app/assets/css/m
 | Secondary text | `text-surface-500` | `dark:text-surface-400` |
 | Borders | `border-surface-200` | `dark:border-surface-800` |
 | Primary button | `bg-brand-600 text-white` | Same (brand works in both modes) |
+| Active sidebar item | `bg-brand-50 text-brand-700 font-medium` | `dark:bg-brand-950 dark:text-brand-400` |
+| Sidebar text | `text-surface-600` | `dark:text-surface-400` |
+| Sidebar hover | `hover:bg-surface-100 hover:text-surface-900` | `dark:hover:bg-surface-800` |
 
-See [tailwindcss.instructions.md](tailwindcss.instructions.md) for the full token reference.
+### Dashboard layout pattern
+
+The dashboard layout provides a sidebar + full-width main area. Each page controls its own width:
+
+```vue
+<!-- Page root element — always include mx-auto with max-w-* -->
+<div class="mx-auto max-w-3xl">
+  <!-- page content -->
+</div>
+```
+
+Full-width pages (e.g., pipeline Kanban board) omit `max-w-*`.
+
+### Sidebar styling conventions
+
+- Uses Tailwind utility classes only (no `<style scoped>`)
+- Nav items use Lucide icons (`size-4`) with `gap-2.5` spacing
+- Active state: `bg-brand-50 text-brand-700 font-medium`
+- Dynamic job context section separated by `border-t border-surface-200`
 
 ---
 

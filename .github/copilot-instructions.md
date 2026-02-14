@@ -47,6 +47,23 @@ public/           # Static assets
 docker-compose.yml
 ```
 
+### Sidebar & Navigation
+
+The `AppSidebar` component (`app/components/AppSidebar.vue`) provides:
+- **Main nav**: Dashboard, Jobs, Candidates, Applications — icons from `lucide-vue-next`, Tailwind utility classes (no scoped CSS)
+- **Dynamic job context nav**: When the route matches `/dashboard/jobs/:id/*`, a contextual sub-nav appears with tabs:
+  - **Overview** → `/dashboard/jobs/:id` (job detail)
+  - **Pipeline** → `/dashboard/jobs/:id/pipeline` (Kanban board)
+  - **Application Form** → `/dashboard/jobs/:id/application-form` (custom questions + shareable link)
+- The sidebar detects the active job from `route.path` — no props or global state needed
+- Active tab highlighting uses exact route matching via a local `isActiveTab(to, exact)` helper
+
+### Dashboard Layout
+
+The `dashboard` layout (`app/layouts/dashboard.vue`) provides only the sidebar + a full-width `<main>` area. Each page controls its own `max-w-*` and must include `mx-auto` for centering:
+- Content pages: `mx-auto max-w-3xl` or `mx-auto max-w-4xl`
+- Full-width pages (e.g., pipeline Kanban): no `max-w-*` constraint
+
 ### Public vs Authenticated Routes
 
 - **Authenticated API**: `server/api/jobs/`, `server/api/candidates/` — require `requireAuth(event)`
@@ -197,3 +214,5 @@ Use **npm** (lockfile is `package-lock.json`).
 - Don't interpolate class names (`bg-${color}-500`) — Tailwind can't detect them
 - Don't use emoji or inline SVG paths for icons — use `lucide-vue-next` components
 - Don't use Heroicons, Font Awesome, or other icon libraries — standardize on Lucide
+- Don't put `max-w-*` in the dashboard layout — each page sets its own `mx-auto max-w-*`
+- Don't add "Back to X" links on job sub-pages (overview, pipeline, application form) — sidebar provides the navigation
