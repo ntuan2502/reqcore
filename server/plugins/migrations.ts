@@ -18,9 +18,12 @@ export default defineNitroPlugin(async () => {
     }
 
     console.log('[Applirank] Running database migrations...')
+    // Suppress harmless NOTICE messages (e.g. "schema already exists, skipping")
+    await db.execute(`SET client_min_messages TO warning`)
     await migrate(db, {
       migrationsFolder: './server/database/migrations',
     })
+    await db.execute(`SET client_min_messages TO notice`)
     console.log('[Applirank] Database migrations applied successfully')
   } catch (error) {
     console.error('[Applirank] Migration failed:', error)

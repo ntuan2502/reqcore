@@ -14,7 +14,7 @@ async function handleSignOut() {
 const navItems = [
   { label: 'Dashboard', to: '/dashboard', enabled: true },
   { label: 'Jobs', to: '/dashboard/jobs', enabled: true },
-  { label: 'Candidates', to: '/dashboard/candidates', enabled: false },
+  { label: 'Candidates', to: '/dashboard/candidates', enabled: true },
   { label: 'Applications', to: '/dashboard/applications', enabled: false },
 ]
 </script>

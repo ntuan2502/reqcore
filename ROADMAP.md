@@ -9,9 +9,9 @@
 
 ## 🎯 Current Focus
 
-**Phase 1, Milestone 4: Candidate Management** — Build full CRUD for candidates with deduplication.
+**Phase 1, Milestone 5: Applications & Pipeline** — Link candidates to jobs, track through hiring stages.
 
-> **Recently completed**: Milestone 7b (Public Job Board) — Applicants can now browse open positions, view job details, and apply from a public job board.
+> **Recently completed**: Milestone 4 (Candidate Management) — Full CRUD for candidates with deduplication, search, and application/document views.
 
 ---
 
@@ -84,19 +84,19 @@ Full CRUD for jobs with status workflow.
 - [x] Shared Zod validation schemas (`server/utils/schemas/job.ts`)
 - [x] Sidebar Jobs link enabled
 
-### Milestone 4: Candidate Management (not started)
+### Milestone 4: Candidate Management ✅
 
 Full CRUD for candidates with deduplication.
 
-- [ ] API: `GET /api/candidates` — list candidates (org-scoped)
-- [ ] API: `POST /api/candidates` — create candidate (dedupe by email)
-- [ ] API: `GET /api/candidates/:id` — candidate detail
-- [ ] API: `PATCH /api/candidates/:id` — update candidate
-- [ ] API: `DELETE /api/candidates/:id` — delete candidate
-- [ ] Composable: `useCandidates()` and `useCandidate(id)`
-- [ ] Page: Candidates list
-- [ ] Page: Candidate detail (with applications & documents tabs)
-- [ ] Page: Candidate creation form
+- [x] API: `GET /api/candidates` — list candidates (org-scoped)
+- [x] API: `POST /api/candidates` — create candidate (dedupe by email)
+- [x] API: `GET /api/candidates/:id` — candidate detail
+- [x] API: `PATCH /api/candidates/:id` — update candidate
+- [x] API: `DELETE /api/candidates/:id` — delete candidate
+- [x] Composable: `useCandidates()` and `useCandidate(id)`
+- [x] Page: Candidates list
+- [x] Page: Candidate detail (with applications & documents tabs)
+- [x] Page: Candidate creation form
 
 ### Milestone 5: Applications & Pipeline (not started)
 
@@ -241,6 +241,7 @@ Goal: Ready for real teams to self-host in production.
 | 3. Job Management | 2026-02-14 |
 | 7a. Custom Application Forms & Public Submission | 2026-02-14 |
 | 7b. Public Job Board | 2026-02-14 |
+| 4. Candidate Management | 2026-02-14 |
 
 ---
 
