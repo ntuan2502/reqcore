@@ -53,34 +53,34 @@ async function handleSignUp() {
 </script>
 
 <template>
-  <form class="auth-form" @submit.prevent="handleSignUp">
-    <h2 class="form-title">Create your account</h2>
+  <form class="flex flex-col gap-4" @submit.prevent="handleSignUp">
+    <h2 class="text-xl font-semibold text-center text-surface-900 dark:text-surface-100 mb-2">Create your account</h2>
 
-    <div v-if="error" class="form-error">{{ error }}</div>
+    <div v-if="error" class="rounded-md border border-danger-200 dark:border-danger-800 bg-danger-50 dark:bg-danger-950 p-3 text-sm text-danger-700 dark:text-danger-400">{{ error }}</div>
 
-    <label class="form-label">
+    <label class="flex flex-col gap-1 text-sm font-medium text-surface-700 dark:text-surface-300">
       <span>Name</span>
       <input
         v-model="name"
         type="text"
         autocomplete="name"
         required
-        class="form-input"
+        class="px-3 py-2 border border-surface-300 dark:border-surface-700 rounded-md text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-800 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15"
       />
     </label>
 
-    <label class="form-label">
+    <label class="flex flex-col gap-1 text-sm font-medium text-surface-700 dark:text-surface-300">
       <span>Email</span>
       <input
         v-model="email"
         type="email"
         autocomplete="email"
         required
-        class="form-input"
+        class="px-3 py-2 border border-surface-300 dark:border-surface-700 rounded-md text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-800 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15"
       />
     </label>
 
-    <label class="form-label">
+    <label class="flex flex-col gap-1 text-sm font-medium text-surface-700 dark:text-surface-300">
       <span>Password</span>
       <input
         v-model="password"
@@ -88,112 +88,34 @@ async function handleSignUp() {
         autocomplete="new-password"
         required
         minlength="8"
-        class="form-input"
+        class="px-3 py-2 border border-surface-300 dark:border-surface-700 rounded-md text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-800 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15"
       />
     </label>
 
-    <label class="form-label">
+    <label class="flex flex-col gap-1 text-sm font-medium text-surface-700 dark:text-surface-300">
       <span>Confirm password</span>
       <input
         v-model="confirmPassword"
         type="password"
         autocomplete="new-password"
         required
-        class="form-input"
+        class="px-3 py-2 border border-surface-300 dark:border-surface-700 rounded-md text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-800 outline-none transition-colors focus:border-brand-500 focus:ring-2 focus:ring-brand-500/15"
       />
     </label>
 
-    <button type="submit" :disabled="isLoading" class="form-button">
+    <button
+      type="submit"
+      :disabled="isLoading"
+      class="mt-2 px-4 py-2.5 bg-brand-600 text-white rounded-md text-sm font-medium hover:bg-brand-700 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
+    >
       {{ isLoading ? 'Creating account…' : 'Sign up' }}
     </button>
 
-    <p class="form-footer">
+    <p class="text-center text-sm text-surface-500 dark:text-surface-400">
       Already have an account?
-      <NuxtLink to="/auth/sign-in">Sign in</NuxtLink>
+      <NuxtLink to="/auth/sign-in" class="text-brand-600 dark:text-brand-400 hover:underline">Sign in</NuxtLink>
     </p>
   </form>
 </template>
 
-<style scoped>
-.auth-form {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
 
-.form-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin: 0 0 0.5rem;
-  text-align: center;
-}
-
-.form-error {
-  background: #fef2f2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
-  border-radius: 6px;
-  padding: 0.75rem;
-  font-size: 0.875rem;
-}
-
-.form-label {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  font-size: 0.875rem;
-  font-weight: 500;
-  color: #374151;
-}
-
-.form-input {
-  padding: 0.5rem 0.75rem;
-  border: 1px solid #d1d5db;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  outline: none;
-  transition: border-color 0.15s;
-}
-
-.form-input:focus {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-}
-
-.form-button {
-  padding: 0.625rem 1rem;
-  background: #111;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  cursor: pointer;
-  margin-top: 0.5rem;
-}
-
-.form-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.form-button:hover:not(:disabled) {
-  background: #333;
-}
-
-.form-footer {
-  text-align: center;
-  font-size: 0.875rem;
-  color: #666;
-  margin: 0;
-}
-
-.form-footer a {
-  color: #2563eb;
-  text-decoration: none;
-}
-
-.form-footer a:hover {
-  text-decoration: underline;
-}
-</style>

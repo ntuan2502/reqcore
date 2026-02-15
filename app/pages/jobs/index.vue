@@ -85,7 +85,7 @@ function formatDate(dateStr: string) {
   <div>
     <!-- Page header -->
     <div class="mb-8">
-      <h1 class="text-2xl font-bold text-surface-900">Open Positions</h1>
+      <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-100">Open Positions</h1>
       <p class="text-sm text-surface-500 mt-1">
         Browse our current openings and find your next opportunity.
       </p>
@@ -100,14 +100,14 @@ function formatDate(dateStr: string) {
           v-model="searchInput"
           type="text"
           placeholder="Search jobs by title or location…"
-          class="w-full rounded-lg border border-surface-300 pl-9 pr-3 py-2 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
+          class="w-full rounded-lg border border-surface-300 dark:border-surface-700 pl-9 pr-3 py-2 text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
         />
       </div>
 
       <!-- Type filter -->
       <select
         :value="typeFilter ?? ''"
-        class="rounded-lg border border-surface-300 px-3 py-2 text-sm text-surface-700 bg-white focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
+        class="rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-2 text-sm text-surface-700 dark:text-surface-300 bg-white dark:bg-surface-900 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
         @change="typeFilter = ($event.target as HTMLSelectElement).value || undefined"
       >
         <option v-for="opt in typeOptions" :key="String(opt.value)" :value="opt.value ?? ''">
@@ -124,7 +124,7 @@ function formatDate(dateStr: string) {
     <!-- Error state -->
     <div
       v-else-if="error"
-      class="rounded-lg border border-danger-200 bg-danger-50 p-4 text-sm text-danger-700"
+      class="rounded-lg border border-danger-200 dark:border-danger-800 bg-danger-50 dark:bg-danger-950 p-4 text-sm text-danger-700 dark:text-danger-400"
     >
       Failed to load jobs. Please try again.
       <button class="underline ml-1 cursor-pointer" @click="refresh()">Retry</button>
@@ -133,10 +133,10 @@ function formatDate(dateStr: string) {
     <!-- Empty state -->
     <div
       v-else-if="jobs.length === 0"
-      class="rounded-lg border border-surface-200 bg-white p-12 text-center"
+      class="rounded-lg border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 p-12 text-center"
     >
       <Briefcase class="size-10 text-surface-300 mx-auto mb-3" />
-      <h3 class="text-base font-semibold text-surface-700 mb-1">No open positions</h3>
+      <h3 class="text-base font-semibold text-surface-700 dark:text-surface-300 mb-1">No open positions</h3>
       <p class="text-sm text-surface-500">
         <template v-if="searchQuery || typeFilter">
           No jobs match your current filters. Try adjusting your search.
@@ -153,12 +153,12 @@ function formatDate(dateStr: string) {
         v-for="j in jobs"
         :key="j.id"
         :to="`/jobs/${j.slug}`"
-        class="block rounded-lg border border-surface-200 bg-white px-5 py-4 hover:border-surface-300 hover:shadow-sm transition-all group"
+        class="block rounded-lg border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 px-5 py-4 hover:border-surface-300 dark:hover:border-surface-700 hover:shadow-sm transition-all group"
       >
         <div class="flex items-start justify-between gap-4">
           <div class="min-w-0 flex-1">
             <!-- Title -->
-            <h2 class="text-base font-semibold text-surface-900 group-hover:text-brand-600 transition-colors">
+            <h2 class="text-base font-semibold text-surface-900 dark:text-surface-100 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
               {{ j.title }}
             </h2>
 
@@ -178,7 +178,7 @@ function formatDate(dateStr: string) {
             </div>
 
             <!-- Description preview -->
-            <p v-if="j.description" class="mt-2 text-sm text-surface-600 line-clamp-2">
+            <p v-if="j.description" class="mt-2 text-sm text-surface-600 dark:text-surface-400 line-clamp-2">
               {{ j.description }}
             </p>
           </div>
@@ -192,7 +192,7 @@ function formatDate(dateStr: string) {
       <div v-if="totalPages > 1" class="flex items-center justify-between pt-4">
         <button
           :disabled="page <= 1"
-          class="inline-flex items-center gap-1 rounded-lg border border-surface-300 px-3 py-1.5 text-sm font-medium text-surface-700 hover:bg-surface-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          class="inline-flex items-center gap-1 rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-1.5 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           @click="page--"
         >
           <ChevronLeft class="size-4" />
@@ -205,7 +205,7 @@ function formatDate(dateStr: string) {
 
         <button
           :disabled="page >= totalPages"
-          class="inline-flex items-center gap-1 rounded-lg border border-surface-300 px-3 py-1.5 text-sm font-medium text-surface-700 hover:bg-surface-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+          class="inline-flex items-center gap-1 rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-1.5 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
           @click="page++"
         >
           Next

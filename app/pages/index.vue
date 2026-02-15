@@ -20,6 +20,7 @@ import {
   Check,
   Hammer,
   Telescope,
+  Quote,
 } from 'lucide-vue-next'
 
 useSeoMeta({
@@ -239,6 +240,87 @@ useHead({
               Local-first storage and local AI via Ollama. Candidate PII never has to leave your private network.
             </p>
           </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ─── Manifesto ──────────────────────────────────── -->
+    <section class="relative overflow-hidden border-t border-white/[0.06] py-24 sm:py-32">
+      <!-- Glow -->
+      <div class="pointer-events-none absolute inset-0" aria-hidden="true">
+        <div class="absolute top-0 left-1/3 h-[500px] w-[600px] -translate-y-1/3 rounded-full bg-brand-500/[0.05] blur-[150px]" />
+        <div class="absolute right-0 bottom-1/4 h-[400px] w-[500px] translate-x-1/4 rounded-full bg-accent-500/[0.04] blur-[130px]" />
+      </div>
+
+      <div class="relative mx-auto max-w-3xl px-6">
+        <div class="mx-auto max-w-2xl text-center">
+          <p class="text-sm font-semibold tracking-[0.2em] text-brand-400 uppercase">Why we exist</p>
+          <h2 class="mt-4 text-3xl font-bold tracking-tight text-white sm:text-4xl">
+            Stop renting. Start owning.
+          </h2>
+        </div>
+
+        <!-- Letter-style manifesto card -->
+        <div class="relative mt-14 rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8 sm:p-12">
+          <!-- Decorative quote mark -->
+          <Quote
+            class="absolute -top-4 left-8 h-8 w-8 rotate-180 text-brand-500/30 sm:left-12"
+            :stroke-width="1.5"
+          />
+
+          <div class="space-y-6 text-base leading-[1.8] text-surface-300 sm:text-lg sm:leading-[1.85]">
+            <p>
+              I'm building this because I'm tired of seeing companies get charged
+              <span class="font-semibold text-white">huge amounts of money for simple features.</span>
+            </p>
+
+            <p>
+              If you use Greenhouse or Workday, you know how it works. These big SaaS
+              companies don't care about the community. They just want to extract as
+              much money as they can &mdash; and they
+              <span class="font-semibold text-white">&ldquo;tax&rdquo; you just for growing.</span>
+              You're forced to pay them because, until now, there hasn't been a great
+              open-source alternative.
+            </p>
+
+            <p>
+              I want to change that. I'm building a tool that is
+              <span class="font-semibold text-white">100% free and rooted in open source</span>
+              &mdash; like Grafana or PostHog, but for hiring.
+            </p>
+
+            <p>
+              This is about giving the power back to the recruiters. You should be able
+              to <span class="font-semibold text-white">own your data and your process</span>
+              without being squeezed by a corporate boardroom.
+            </p>
+
+            <p class="text-lg font-semibold text-white sm:text-xl">
+              Let's stop renting our hiring tools and start owning them.
+            </p>
+          </div>
+
+          <!-- Separator + attribution -->
+          <div class="mt-8 flex items-center gap-4 border-t border-white/[0.06] pt-8">
+            <div class="flex h-10 w-10 items-center justify-center rounded-full bg-brand-500 text-sm font-bold text-white">
+              A
+            </div>
+            <div>
+              <div class="text-sm font-semibold text-white">The Applirank Team</div>
+              <div class="text-[13px] text-surface-500">Building the sovereign recruitment engine</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Inline CTA -->
+        <div class="mt-10 flex justify-center">
+          <NuxtLink
+            to="/auth/sign-up"
+            class="group inline-flex items-center gap-2 rounded-lg border border-white/[0.1] bg-white/[0.04] px-6 py-3 text-sm font-semibold text-white transition hover:border-white/[0.2] hover:bg-white/[0.08]"
+          >
+            Join the mission
+            <ArrowRight class="h-3.5 w-3.5 transition group-hover:translate-x-0.5" />
+          </NuxtLink>
         </div>
       </div>
     </section>

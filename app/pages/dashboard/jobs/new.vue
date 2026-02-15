@@ -80,18 +80,18 @@ const typeOptions = [
     <!-- Back link -->
     <NuxtLink
       to="/dashboard/jobs"
-      class="inline-flex items-center gap-1 text-sm text-surface-500 hover:text-surface-700 mb-6 transition-colors"
+      class="inline-flex items-center gap-1 text-sm text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-200 mb-6 transition-colors"
     >
       <ArrowLeft class="size-4" />
       Back to Jobs
     </NuxtLink>
 
-    <h1 class="text-2xl font-bold text-surface-900 mb-6">Create Job</h1>
+    <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-6">Create Job</h1>
 
     <!-- Server error -->
     <div
       v-if="submitError"
-      class="rounded-lg border border-danger-200 bg-danger-50 p-3 text-sm text-danger-700 mb-4"
+      class="rounded-lg border border-danger-200 dark:border-danger-800 bg-danger-50 dark:bg-danger-950 p-3 text-sm text-danger-700 dark:text-danger-400 mb-4"
     >
       {{ submitError }}
     </div>
@@ -99,7 +99,7 @@ const typeOptions = [
     <form class="space-y-5" @submit.prevent="handleSubmit">
       <!-- Title -->
       <div>
-        <label for="title" class="block text-sm font-medium text-surface-700 mb-1">
+        <label for="title" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
           Title <span class="text-danger-500">*</span>
         </label>
         <input
@@ -107,15 +107,15 @@ const typeOptions = [
           v-model="form.title"
           type="text"
           placeholder="e.g. Senior Frontend Engineer"
-          class="w-full rounded-lg border px-3 py-2 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
-          :class="errors.title ? 'border-danger-300' : 'border-surface-300'"
+          class="w-full rounded-lg border px-3 py-2 text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
+          :class="errors.title ? 'border-danger-300' : 'border-surface-300 dark:border-surface-700'"
         />
-        <p v-if="errors.title" class="mt-1 text-xs text-danger-600">{{ errors.title }}</p>
+        <p v-if="errors.title" class="mt-1 text-xs text-danger-600 dark:text-danger-400">{{ errors.title }}</p>
       </div>
 
       <!-- Description -->
       <div>
-        <label for="description" class="block text-sm font-medium text-surface-700 mb-1">
+        <label for="description" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
           Description
         </label>
         <textarea
@@ -123,13 +123,13 @@ const typeOptions = [
           v-model="form.description"
           rows="5"
           placeholder="Describe the role, responsibilities, and requirements…"
-          class="w-full rounded-lg border border-surface-300 px-3 py-2 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
+          class="w-full rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-2 text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
         />
       </div>
 
       <!-- Location -->
       <div>
-        <label for="location" class="block text-sm font-medium text-surface-700 mb-1">
+        <label for="location" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
           Location
         </label>
         <input
@@ -137,19 +137,19 @@ const typeOptions = [
           v-model="form.location"
           type="text"
           placeholder="e.g. Remote, New York, Berlin"
-          class="w-full rounded-lg border border-surface-300 px-3 py-2 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
+          class="w-full rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-2 text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors"
         />
       </div>
 
       <!-- Type -->
       <div>
-        <label for="type" class="block text-sm font-medium text-surface-700 mb-1">
+        <label for="type" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
           Employment Type
         </label>
         <select
           id="type"
           v-model="form.type"
-          class="w-full rounded-lg border border-surface-300 px-3 py-2 text-sm text-surface-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors bg-white"
+          class="w-full rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-2 text-sm text-surface-900 dark:text-surface-100 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500 transition-colors bg-white dark:bg-surface-900"
         >
           <option v-for="opt in typeOptions" :key="opt.value" :value="opt.value">
             {{ opt.label }}
@@ -168,7 +168,7 @@ const typeOptions = [
         </button>
         <NuxtLink
           to="/dashboard/jobs"
-          class="rounded-lg border border-surface-300 px-4 py-2 text-sm font-medium text-surface-700 hover:bg-surface-50 transition-colors"
+          class="rounded-lg border border-surface-300 dark:border-surface-700 px-4 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
         >
           Cancel
         </NuxtLink>

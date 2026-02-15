@@ -45,13 +45,13 @@ function formatDate(dateStr: string) {
 
     <!-- Not found / not open -->
     <div v-else-if="fetchError" class="text-center py-16">
-      <h1 class="text-xl font-bold text-surface-900 mb-2">Job Not Found</h1>
+      <h1 class="text-xl font-bold text-surface-900 dark:text-surface-100 mb-2">Job Not Found</h1>
       <p class="text-sm text-surface-500 mb-6">
         This position may no longer be available or is not currently accepting applications.
       </p>
       <NuxtLink
         to="/jobs"
-        class="inline-flex items-center gap-1.5 rounded-lg border border-surface-300 px-4 py-2 text-sm font-medium text-surface-700 hover:bg-surface-50 transition-colors"
+        class="inline-flex items-center gap-1.5 rounded-lg border border-surface-300 dark:border-surface-700 px-4 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
       >
         <ArrowLeft class="size-4" />
         Browse all positions
@@ -63,7 +63,7 @@ function formatDate(dateStr: string) {
       <!-- Back link -->
       <NuxtLink
         to="/jobs"
-        class="inline-flex items-center gap-1 text-sm text-surface-500 hover:text-surface-700 transition-colors mb-6"
+        class="inline-flex items-center gap-1 text-sm text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 transition-colors mb-6"
       >
         <ArrowLeft class="size-3.5" />
         All positions
@@ -71,7 +71,7 @@ function formatDate(dateStr: string) {
 
       <!-- Header -->
       <div class="mb-8">
-        <h1 class="text-2xl font-bold text-surface-900 mb-3">{{ job.title }}</h1>
+        <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-3">{{ job.title }}</h1>
 
         <div class="flex flex-wrap items-center gap-4 text-sm text-surface-500">
           <span class="inline-flex items-center gap-1.5">
@@ -90,8 +90,8 @@ function formatDate(dateStr: string) {
       </div>
 
       <!-- Apply CTA (top) -->
-      <div class="rounded-lg border border-brand-200 bg-brand-50 p-4 mb-8 flex items-center justify-between gap-4">
-        <p class="text-sm text-brand-800">
+      <div class="rounded-lg border border-brand-200 dark:border-brand-800 bg-brand-50 dark:bg-brand-950 p-4 mb-8 flex items-center justify-between gap-4">
+        <p class="text-sm text-brand-800 dark:text-brand-200">
           Interested in this role? Apply now and we'll review your application.
         </p>
         <NuxtLink
@@ -105,15 +105,15 @@ function formatDate(dateStr: string) {
 
       <!-- Description -->
       <div v-if="job.description" class="mb-8">
-        <h2 class="text-lg font-semibold text-surface-900 mb-3">About this role</h2>
-        <div class="text-sm text-surface-700 leading-relaxed whitespace-pre-wrap">
+        <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-3">About this role</h2>
+        <div class="text-sm text-surface-700 dark:text-surface-300 leading-relaxed whitespace-pre-wrap">
           {{ job.description }}
         </div>
       </div>
 
       <!-- Custom questions preview -->
       <div v-if="job.questions && job.questions.length > 0" class="mb-8">
-        <h2 class="text-lg font-semibold text-surface-900 mb-3">Application Questions</h2>
+        <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-3">Application Questions</h2>
         <p class="text-sm text-surface-500 mb-3">
           You'll be asked to answer {{ job.questions.length }} additional
           question{{ job.questions.length === 1 ? '' : 's' }} when you apply.
@@ -122,7 +122,7 @@ function formatDate(dateStr: string) {
           <li
             v-for="q in job.questions"
             :key="q.id"
-            class="flex items-start gap-2 text-sm text-surface-600"
+            class="flex items-start gap-2 text-sm text-surface-600 dark:text-surface-400"
           >
             <span class="text-surface-400 mt-0.5">•</span>
             <span>
@@ -133,7 +133,7 @@ function formatDate(dateStr: string) {
         </ul>
       </div>
 
-      <hr class="border-surface-200 mb-8" />
+      <hr class="border-surface-200 dark:border-surface-800 mb-8" />
 
       <!-- Bottom Apply CTA -->
       <div class="text-center">

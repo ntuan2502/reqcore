@@ -710,16 +710,16 @@ function formatFileSize(bytes: number | null | undefined): string {
       <Teleport to="body">
         <div v-if="showDeleteConfirm" class="fixed inset-0 z-50 flex items-center justify-center">
           <div class="absolute inset-0 bg-black/50" @click="showDeleteConfirm = false" />
-          <div class="relative bg-white rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
-            <h3 class="text-lg font-semibold text-surface-900 mb-2">Delete Candidate</h3>
-            <p class="text-sm text-surface-600 mb-4">
+          <div class="relative bg-white dark:bg-surface-900 rounded-xl shadow-xl p-6 max-w-sm w-full mx-4">
+            <h3 class="text-lg font-semibold text-surface-900 dark:text-surface-50 mb-2">Delete Candidate</h3>
+            <p class="text-sm text-surface-600 dark:text-surface-400 mb-4">
               Are you sure you want to delete <strong>{{ candidate.firstName }} {{ candidate.lastName }}</strong>?
               This will also delete all their applications and documents. This action cannot be undone.
             </p>
             <div class="flex justify-end gap-2">
               <button
                 :disabled="isDeleting"
-                class="rounded-lg border border-surface-300 px-3 py-1.5 text-sm font-medium text-surface-700 hover:bg-surface-50 transition-colors"
+                class="rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-1.5 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
                 @click="showDeleteConfirm = false"
               >
                 Cancel

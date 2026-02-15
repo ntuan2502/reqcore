@@ -193,7 +193,7 @@ const typeLabels: Record<string, string> = {
 
     <!-- Not found / not open -->
     <div v-else-if="fetchError" class="text-center py-12">
-      <h1 class="text-xl font-bold text-surface-900 mb-2">Job Not Found</h1>
+      <h1 class="text-xl font-bold text-surface-900 dark:text-surface-100 mb-2">Job Not Found</h1>
       <p class="text-sm text-surface-500 mb-4">
         This position may no longer be accepting applications.
       </p>
@@ -210,7 +210,7 @@ const typeLabels: Record<string, string> = {
       <!-- Back to job detail -->
       <NuxtLink
         :to="`/jobs/${jobSlug}`"
-        class="inline-flex items-center gap-1 text-sm text-surface-500 hover:text-surface-700 transition-colors mb-6"
+        class="inline-flex items-center gap-1 text-sm text-surface-500 hover:text-surface-700 dark:hover:text-surface-300 transition-colors mb-6"
       >
         <svg class="size-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
         Back to job details
@@ -218,7 +218,7 @@ const typeLabels: Record<string, string> = {
 
       <!-- Job header -->
       <div class="mb-8">
-        <h1 class="text-2xl font-bold text-surface-900 mb-2">{{ job.title }}</h1>
+        <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">{{ job.title }}</h1>
         <div class="flex items-center gap-4 text-sm text-surface-500">
           <span class="inline-flex items-center gap-1">
             <Briefcase class="size-3.5" />
@@ -229,19 +229,19 @@ const typeLabels: Record<string, string> = {
             {{ job.location }}
           </span>
         </div>
-        <p v-if="job.description" class="mt-4 text-sm text-surface-600 whitespace-pre-wrap">
+        <p v-if="job.description" class="mt-4 text-sm text-surface-600 dark:text-surface-400 whitespace-pre-wrap">
           {{ job.description }}
         </p>
       </div>
 
-      <hr class="border-surface-200 mb-8" />
+      <hr class="border-surface-200 dark:border-surface-800 mb-8" />
 
-      <h2 class="text-lg font-semibold text-surface-900 mb-6">Apply for this position</h2>
+      <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-6">Apply for this position</h2>
 
       <!-- Server error -->
       <div
         v-if="submitError"
-        class="rounded-lg border border-danger-200 bg-danger-50 p-3 text-sm text-danger-700 mb-4"
+        class="rounded-lg border border-danger-200 dark:border-danger-800 bg-danger-50 dark:bg-danger-950 p-3 text-sm text-danger-700 dark:text-danger-400 mb-4"
       >
         {{ submitError }}
       </div>
@@ -257,38 +257,38 @@ const typeLabels: Record<string, string> = {
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <!-- First Name -->
           <div>
-            <label for="firstName" class="block text-sm font-medium text-surface-700 mb-1">
+            <label for="firstName" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
               First Name <span class="text-danger-500">*</span>
             </label>
             <input
               id="firstName"
               v-model="form.firstName"
               type="text"
-              class="w-full rounded-lg border px-3 py-2 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
-              :class="errors.firstName ? 'border-danger-300' : 'border-surface-300'"
+              class="w-full rounded-lg border px-3 py-2 text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
+              :class="errors.firstName ? 'border-danger-300 dark:border-danger-700' : 'border-surface-300 dark:border-surface-700'"
             />
-            <p v-if="errors.firstName" class="mt-1 text-xs text-danger-600">{{ errors.firstName }}</p>
+            <p v-if="errors.firstName" class="mt-1 text-xs text-danger-600 dark:text-danger-400">{{ errors.firstName }}</p>
           </div>
 
           <!-- Last Name -->
           <div>
-            <label for="lastName" class="block text-sm font-medium text-surface-700 mb-1">
+            <label for="lastName" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
               Last Name <span class="text-danger-500">*</span>
             </label>
             <input
               id="lastName"
               v-model="form.lastName"
               type="text"
-              class="w-full rounded-lg border px-3 py-2 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
-              :class="errors.lastName ? 'border-danger-300' : 'border-surface-300'"
+              class="w-full rounded-lg border px-3 py-2 text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
+              :class="errors.lastName ? 'border-danger-300 dark:border-danger-700' : 'border-surface-300 dark:border-surface-700'"
             />
-            <p v-if="errors.lastName" class="mt-1 text-xs text-danger-600">{{ errors.lastName }}</p>
+            <p v-if="errors.lastName" class="mt-1 text-xs text-danger-600 dark:text-danger-400">{{ errors.lastName }}</p>
           </div>
         </div>
 
         <!-- Email -->
         <div>
-          <label for="email" class="block text-sm font-medium text-surface-700 mb-1">
+          <label for="email" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
             Email <span class="text-danger-500">*</span>
           </label>
           <input
@@ -296,15 +296,15 @@ const typeLabels: Record<string, string> = {
             v-model="form.email"
             type="email"
             placeholder="you@example.com"
-            class="w-full rounded-lg border px-3 py-2 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
-            :class="errors.email ? 'border-danger-300' : 'border-surface-300'"
+            class="w-full rounded-lg border px-3 py-2 text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
+            :class="errors.email ? 'border-danger-300 dark:border-danger-700' : 'border-surface-300 dark:border-surface-700'"
           />
-          <p v-if="errors.email" class="mt-1 text-xs text-danger-600">{{ errors.email }}</p>
+          <p v-if="errors.email" class="mt-1 text-xs text-danger-600 dark:text-danger-400">{{ errors.email }}</p>
         </div>
 
         <!-- Phone -->
         <div>
-          <label for="phone" class="block text-sm font-medium text-surface-700 mb-1">
+          <label for="phone" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
             Phone
           </label>
           <input
@@ -312,13 +312,13 @@ const typeLabels: Record<string, string> = {
             v-model="form.phone"
             type="tel"
             placeholder="+1 (555) 123-4567"
-            class="w-full rounded-lg border border-surface-300 px-3 py-2 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
+            class="w-full rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-2 text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
           />
         </div>
 
         <!-- Custom questions -->
         <template v-if="job.questions && job.questions.length > 0">
-          <hr class="border-surface-200" />
+          <hr class="border-surface-200 dark:border-surface-800" />
 
           <DynamicField
             v-for="q in job.questions"

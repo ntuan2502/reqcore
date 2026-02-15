@@ -14,21 +14,21 @@
 @theme {
 
   /* ── Brand / Primary ──────────────────────────────────
-     Deep indigo — conveys trust, professionalism, and
-     sovereignty. Used for primary actions, active states,
-     and brand identity.
-     Inspired by Linear, Raycast, Plane. */
-  --color-brand-50:  oklch(97.0% 0.012 268);
-  --color-brand-100: oklch(93.5% 0.028 268);
-  --color-brand-200: oklch(87.0% 0.058 268);
-  --color-brand-300: oklch(78.0% 0.110 268);
-  --color-brand-400: oklch(66.0% 0.180 268);
-  --color-brand-500: oklch(55.0% 0.240 268);
-  --color-brand-600: oklch(48.0% 0.250 268);
-  --color-brand-700: oklch(42.0% 0.230 268);
-  --color-brand-800: oklch(36.0% 0.190 268);
-  --color-brand-900: oklch(30.0% 0.140 268);
-  --color-brand-950: oklch(22.0% 0.090 268);
+     Cornflower blue — centered on #6389ff. A lighter,
+     friendlier blue that reads well on both light and dark
+     surfaces. Used for primary actions, active nav, links.
+     Inspired by Supabase's approach (green → blue swap). */
+  --color-brand-50:  oklch(97.0% 0.012 264);
+  --color-brand-100: oklch(93.5% 0.030 264);
+  --color-brand-200: oklch(87.0% 0.065 264);
+  --color-brand-300: oklch(79.0% 0.115 264);
+  --color-brand-400: oklch(72.0% 0.150 264);
+  --color-brand-500: oklch(63.0% 0.170 264);
+  --color-brand-600: oklch(54.0% 0.200 264);
+  --color-brand-700: oklch(46.0% 0.180 264);
+  --color-brand-800: oklch(38.0% 0.150 264);
+  --color-brand-900: oklch(30.0% 0.110 264);
+  --color-brand-950: oklch(18.0% 0.050 264);
 
   /* ── Accent ───────────────────────────────────────────
      Teal — "Glass Box" transparency. Used sparingly for
@@ -43,25 +43,26 @@
   --color-accent-700: oklch(46.0% 0.095 186);
   --color-accent-800: oklch(39.0% 0.078 188);
   --color-accent-900: oklch(33.0% 0.060 188);
-  --color-accent-950: oklch(24.0% 0.042 190);
+  --color-accent-950: oklch(18.0% 0.030 190);
 
   /* ── Surface / neutrals ───────────────────────────────
-     Slate-tinted grays give depth and feel more polished
-     than pure neutrals. Used for backgrounds, cards,
-     borders, text. Keeps the default Tailwind slate-*
-     palette — these are SEMANTIC aliases so AI & devs
-     always pick the right surface token. */
-  --color-surface-50:  oklch(98.4% 0.003 248);
-  --color-surface-100: oklch(96.8% 0.007 248);
-  --color-surface-200: oklch(92.9% 0.013 256);
-  --color-surface-300: oklch(86.9% 0.022 253);
-  --color-surface-400: oklch(70.4% 0.040 257);
-  --color-surface-500: oklch(55.4% 0.046 257);
-  --color-surface-600: oklch(44.6% 0.043 257);
-  --color-surface-700: oklch(37.2% 0.044 257);
-  --color-surface-800: oklch(27.9% 0.041 260);
-  --color-surface-900: oklch(20.8% 0.042 266);
-  --color-surface-950: oklch(12.9% 0.042 265);
+     Near-neutral gray ramp modeled on Supabase's pure-gray
+     dark palette. Very low chroma (≤ 0.006) prevents blue
+     cast in dark mode. Dark end sits around 13–17% for a
+     comfortable dark feel — darker than most, but lighter
+     than the near-black #09090b that felt too oppressive.
+     Light end is barely tinted for polish. */
+  --color-surface-50:  oklch(98.5% 0.002 264);
+  --color-surface-100: oklch(96.5% 0.004 264);
+  --color-surface-200: oklch(93.0% 0.006 264);
+  --color-surface-300: oklch(87.0% 0.008 264);
+  --color-surface-400: oklch(65.0% 0.006 264);
+  --color-surface-500: oklch(53.0% 0.006 264);
+  --color-surface-600: oklch(40.0% 0.005 264);
+  --color-surface-700: oklch(28.0% 0.005 264);
+  --color-surface-800: oklch(25.0% 0.004 264);
+  --color-surface-900: oklch(21.0% 0.003 264);
+  --color-surface-950: oklch(17.0% 0.003 264);
 
   /* ── Success ──────────────────────────────────────────
      Emerald — hired, active, verified, healthy states. */
@@ -75,7 +76,7 @@
   --color-success-700: oklch(50.8% 0.118 166);
   --color-success-800: oklch(43.2% 0.095 167);
   --color-success-900: oklch(37.8% 0.077 169);
-  --color-success-950: oklch(26.2% 0.051 173);
+  --color-success-950: oklch(18.0% 0.030 173);
 
   /* ── Warning ──────────────────────────────────────────
      Amber — drafts, pending reviews, expiring items. */
@@ -89,7 +90,7 @@
   --color-warning-700: oklch(55.5% 0.163 49);
   --color-warning-800: oklch(47.3% 0.137 46);
   --color-warning-900: oklch(41.4% 0.112 46);
-  --color-warning-950: oklch(27.9% 0.077 46);
+  --color-warning-950: oklch(18.0% 0.040 46);
 
   /* ── Danger ───────────────────────────────────────────
      Rose — rejected, errors, destructive actions. Softer
@@ -104,7 +105,7 @@
   --color-danger-700: oklch(51.4% 0.222 17);
   --color-danger-800: oklch(45.5% 0.188 14);
   --color-danger-900: oklch(41.0% 0.159 10);
-  --color-danger-950: oklch(27.1% 0.105 12);
+  --color-danger-950: oklch(18.0% 0.050 12);
 
   /* ── Info ──────────────────────────────────────────────
      Sky — informational notices, help text, highlights. */
@@ -118,7 +119,7 @@
   --color-info-700: oklch(50.0% 0.134 243);
   --color-info-800: oklch(44.3% 0.110 241);
   --color-info-900: oklch(39.1% 0.090 241);
-  --color-info-950: oklch(29.3% 0.066 243);
+  --color-info-950: oklch(18.0% 0.035 243);
 }
 
 /* ── Base reset & defaults ──────────────────────────────── */

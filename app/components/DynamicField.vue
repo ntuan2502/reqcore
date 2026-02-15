@@ -106,14 +106,14 @@ function formatFileSize(bytes: number): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
 
-const inputClasses = 'w-full rounded-lg border px-3 py-2 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors'
-const errorBorderClass = 'border-danger-300'
-const normalBorderClass = 'border-surface-300'
+const inputClasses = 'w-full rounded-lg border px-3 py-2 text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors'
+const errorBorderClass = 'border-danger-300 dark:border-danger-700'
+const normalBorderClass = 'border-surface-300 dark:border-surface-700'
 </script>
 
 <template>
   <div>
-    <label :for="`q-${question.id}`" class="block text-sm font-medium text-surface-700 mb-1">
+    <label :for="`q-${question.id}`" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
       {{ question.label }}
       <span v-if="question.required" class="text-danger-500">*</span>
     </label>
@@ -144,7 +144,7 @@ const normalBorderClass = 'border-surface-300'
       :id="`q-${question.id}`"
       v-model="stringModel"
       :required="question.required"
-      :class="[inputClasses, 'bg-white', error ? errorBorderClass : normalBorderClass]"
+      :class="[inputClasses, 'bg-white dark:bg-surface-900', error ? errorBorderClass : normalBorderClass]"
     >
       <option value="" disabled>Select an option…</option>
       <option v-for="opt in question.options" :key="opt" :value="opt">
@@ -162,10 +162,10 @@ const normalBorderClass = 'border-surface-300'
         <input
           type="checkbox"
           :checked="isOptionSelected(opt)"
-          class="size-4 rounded border-surface-300 text-brand-600 focus:ring-brand-500"
+          class="size-4 rounded border-surface-300 dark:border-surface-700 text-brand-600 focus:ring-brand-500"
           @change="toggleMultiOption(opt)"
         />
-        <span class="text-sm text-surface-700">{{ opt }}</span>
+        <span class="text-sm text-surface-700 dark:text-surface-300">{{ opt }}</span>
       </label>
     </div>
 
@@ -206,9 +206,9 @@ const normalBorderClass = 'border-surface-300'
         :id="`q-${question.id}`"
         v-model="booleanModel"
         type="checkbox"
-        class="size-4 rounded border-surface-300 text-brand-600 focus:ring-brand-500"
+        class="size-4 rounded border-surface-300 dark:border-surface-700 text-brand-600 focus:ring-brand-500"
       />
-      <span class="text-sm text-surface-700">Yes</span>
+      <span class="text-sm text-surface-700 dark:text-surface-300">Yes</span>
     </label>
 
     <!-- File Upload -->
@@ -226,7 +226,7 @@ const normalBorderClass = 'border-surface-300'
         v-if="!selectedFileName"
         type="button"
         class="flex items-center gap-2 rounded-lg border border-dashed px-4 py-3 text-sm transition-colors w-full justify-center"
-        :class="error ? 'border-danger-300 text-danger-600' : 'border-surface-300 text-surface-500 hover:border-brand-400 hover:text-brand-600'"
+        :class="error ? 'border-danger-300 dark:border-danger-700 text-danger-600 dark:text-danger-400' : 'border-surface-300 dark:border-surface-700 text-surface-500 dark:text-surface-400 hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-600 dark:hover:text-brand-400'"
         @click="fileInputRef?.click()"
       >
         <Upload class="size-4" />
@@ -237,9 +237,9 @@ const normalBorderClass = 'border-surface-300'
       <div
         v-else
         class="flex items-center justify-between rounded-lg border px-4 py-2.5 text-sm"
-        :class="error ? 'border-danger-300' : 'border-surface-300'"
+        :class="error ? 'border-danger-300 dark:border-danger-700' : 'border-surface-300 dark:border-surface-700'"
       >
-        <span class="text-surface-700 truncate mr-2">{{ selectedFileName }}</span>
+        <span class="text-surface-700 dark:text-surface-300 truncate mr-2">{{ selectedFileName }}</span>
         <button
           type="button"
           class="shrink-0 rounded p-0.5 text-surface-400 hover:text-danger-600 transition-colors"
@@ -256,6 +256,6 @@ const normalBorderClass = 'border-surface-300'
     </p>
 
     <!-- Error message -->
-    <p v-if="error" class="mt-1 text-xs text-danger-600">{{ error }}</p>
+    <p v-if="error" class="mt-1 text-xs text-danger-600 dark:text-danger-400">{{ error }}</p>
   </div>
 </template>

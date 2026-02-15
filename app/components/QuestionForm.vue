@@ -109,14 +109,14 @@ const isEditing = computed(() => !!props.question)
 </script>
 
 <template>
-  <div class="rounded-lg border border-surface-200 bg-surface-50 p-4">
+  <div class="rounded-lg border border-surface-200 dark:border-surface-800 bg-surface-50 dark:bg-surface-900 p-4">
     <div class="flex items-center justify-between mb-4">
-      <h3 class="text-sm font-semibold text-surface-700">
+      <h3 class="text-sm font-semibold text-surface-700 dark:text-surface-300">
         {{ isEditing ? 'Edit Question' : 'Add Question' }}
       </h3>
       <button
         type="button"
-        class="rounded p-1 text-surface-400 hover:text-surface-600 hover:bg-surface-100 transition-colors"
+        class="rounded p-1 text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
         @click="emit('cancel')"
       >
         <X class="size-4" />
@@ -126,7 +126,7 @@ const isEditing = computed(() => !!props.question)
     <form class="space-y-4" @submit.prevent="handleSubmit">
       <!-- Label -->
       <div>
-        <label for="q-label" class="block text-sm font-medium text-surface-700 mb-1">
+        <label for="q-label" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
           Question <span class="text-danger-500">*</span>
         </label>
         <input
@@ -134,21 +134,21 @@ const isEditing = computed(() => !!props.question)
           v-model="form.label"
           type="text"
           placeholder="e.g. How many years of experience do you have?"
-          class="w-full rounded-lg border px-3 py-2 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
-          :class="errors.label ? 'border-danger-300' : 'border-surface-300'"
+          class="w-full rounded-lg border px-3 py-2 text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-800 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
+          :class="errors.label ? 'border-danger-300' : 'border-surface-300 dark:border-surface-700'"
         />
-        <p v-if="errors.label" class="mt-1 text-xs text-danger-600">{{ errors.label }}</p>
+        <p v-if="errors.label" class="mt-1 text-xs text-danger-600 dark:text-danger-400">{{ errors.label }}</p>
       </div>
 
       <!-- Type -->
       <div>
-        <label for="q-type" class="block text-sm font-medium text-surface-700 mb-1">
+        <label for="q-type" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
           Field Type
         </label>
         <select
           id="q-type"
           v-model="form.type"
-          class="w-full rounded-lg border border-surface-300 px-3 py-2 text-sm text-surface-900 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors bg-white"
+          class="w-full rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-2 text-sm text-surface-900 dark:text-surface-100 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors bg-white dark:bg-surface-800"
         >
           <option v-for="qt in questionTypes" :key="qt.value" :value="qt.value">
             {{ qt.label }}
@@ -158,7 +158,7 @@ const isEditing = computed(() => !!props.question)
 
       <!-- Description / help text -->
       <div>
-        <label for="q-desc" class="block text-sm font-medium text-surface-700 mb-1">
+        <label for="q-desc" class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
           Help Text <span class="text-surface-400 font-normal">(optional)</span>
         </label>
         <input
@@ -166,13 +166,13 @@ const isEditing = computed(() => !!props.question)
           v-model="form.description"
           type="text"
           placeholder="Additional context shown below the field"
-          class="w-full rounded-lg border border-surface-300 px-3 py-2 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
+          class="w-full rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-2 text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-800 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
         />
       </div>
 
       <!-- Options (for select types) -->
       <div v-if="isSelectType">
-        <label class="block text-sm font-medium text-surface-700 mb-1">
+        <label class="block text-sm font-medium text-surface-700 dark:text-surface-300 mb-1">
           Options <span class="text-danger-500">*</span>
         </label>
         <div class="space-y-2">
@@ -181,7 +181,7 @@ const isEditing = computed(() => !!props.question)
               v-model="form.options[index]"
               type="text"
               :placeholder="`Option ${index + 1}`"
-              class="flex-1 rounded-lg border border-surface-300 px-3 py-1.5 text-sm text-surface-900 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
+              class="flex-1 rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-1.5 text-sm text-surface-900 dark:text-surface-100 bg-white dark:bg-surface-800 placeholder:text-surface-400 focus:outline-none focus:ring-2 focus:ring-brand-500 transition-colors"
             />
             <button
               type="button"
@@ -201,7 +201,7 @@ const isEditing = computed(() => !!props.question)
           <Plus class="size-3.5" />
           Add option
         </button>
-        <p v-if="errors.options" class="mt-1 text-xs text-danger-600">{{ errors.options }}</p>
+        <p v-if="errors.options" class="mt-1 text-xs text-danger-600 dark:text-danger-400">{{ errors.options }}</p>
       </div>
 
       <!-- Required -->
@@ -209,9 +209,9 @@ const isEditing = computed(() => !!props.question)
         <input
           v-model="form.required"
           type="checkbox"
-          class="size-4 rounded border-surface-300 text-brand-600 focus:ring-brand-500"
+          class="size-4 rounded border-surface-300 dark:border-surface-700 text-brand-600 focus:ring-brand-500"
         />
-        <span class="text-sm text-surface-700">Required</span>
+        <span class="text-sm text-surface-700 dark:text-surface-300">Required</span>
       </label>
 
       <!-- Actions -->
@@ -224,7 +224,7 @@ const isEditing = computed(() => !!props.question)
         </button>
         <button
           type="button"
-          class="rounded-lg border border-surface-300 px-3 py-1.5 text-sm font-medium text-surface-700 hover:bg-surface-100 transition-colors"
+          class="rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-1.5 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
           @click="emit('cancel')"
         >
           Cancel

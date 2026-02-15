@@ -20,15 +20,15 @@ useSeoMeta({
 
 <template>
   <div class="text-center py-12">
-    <div class="mx-auto mb-6 flex size-16 items-center justify-center rounded-full bg-success-100">
+    <div class="mx-auto mb-6 flex size-16 items-center justify-center rounded-full bg-success-100 dark:bg-success-900">
       <CheckCircle class="size-8 text-success-600" />
     </div>
 
-    <h1 class="text-2xl font-bold text-surface-900 mb-2">
+    <h1 class="text-2xl font-bold text-surface-900 dark:text-surface-100 mb-2">
       Application Submitted!
     </h1>
 
-    <p class="text-surface-600 max-w-md mx-auto mb-2">
+    <p class="text-surface-600 dark:text-surface-400 max-w-md mx-auto mb-2">
       Thank you for applying
       <template v-if="job">
         for the <strong>{{ job.title }}</strong> position
@@ -48,7 +48,7 @@ useSeoMeta({
       </NuxtLink>
       <NuxtLink
         to="/"
-        class="inline-flex items-center rounded-lg border border-surface-300 px-4 py-2 text-sm font-medium text-surface-700 hover:bg-surface-50 transition-colors"
+        class="inline-flex items-center rounded-lg border border-surface-300 dark:border-surface-700 px-4 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
       >
         Back to Home
       </NuxtLink>

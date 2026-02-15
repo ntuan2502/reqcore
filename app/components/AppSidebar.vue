@@ -2,11 +2,13 @@
 import {
   LayoutDashboard, Briefcase, Users, Inbox,
   ChevronLeft, Eye, Kanban, FileText, LogOut, Table2,
+  Sun, Moon,
 } from 'lucide-vue-next'
 
 const route = useRoute()
 const { data: session } = await authClient.useSession(useFetch)
 const isSigningOut = ref(false)
+const { isDark, toggle: toggleColorMode } = useColorMode()
 
 const userName = computed(() => session.value?.user?.name ?? 'User')
 const userEmail = computed(() => session.value?.user?.email ?? '')
@@ -53,12 +55,12 @@ function isActiveTab(to: string, exact: boolean) {
 
 <template>
   <aside
-    class="flex flex-col justify-between w-60 min-w-60 bg-white border-r border-surface-200 py-5 px-3 overflow-y-auto"
+    class="flex flex-col justify-between w-60 min-w-60 bg-white dark:bg-surface-900 border-r border-surface-200 dark:border-surface-800 py-5 px-3 overflow-y-auto"
   >
     <!-- Top -->
     <div class="flex flex-col gap-5">
       <!-- Logo -->
-      <div class="px-2 text-lg font-bold text-surface-900">Applirank</div>
+      <div class="px-2 text-lg font-bold text-surface-900 dark:text-surface-100">Applirank</div>
 
       <!-- Org Switcher -->
       <div>
@@ -71,9 +73,9 @@ function isActiveTab(to: string, exact: boolean) {
           v-for="item in navItems"
           :key="item.to"
           :to="item.to"
-          class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-surface-600 hover:bg-surface-100 hover:text-surface-900 transition-colors no-underline"
+          class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-900 dark:hover:text-surface-100 transition-colors no-underline"
           :class="isActiveTab(item.to, item.exact)
-            ? 'bg-brand-50 text-brand-700 font-medium'
+            ? 'bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-surface-100 font-medium'
             : ''"
         >
           <component :is="item.icon" class="size-4 shrink-0" />
@@ -82,10 +84,10 @@ function isActiveTab(to: string, exact: boolean) {
       </nav>
 
       <!-- Job context sub-nav (when viewing a specific job) -->
-      <div v-if="activeJobId" class="border-t border-surface-200 pt-4">
+      <div v-if="activeJobId" class="border-t border-surface-200 dark:border-surface-800 pt-4">
         <NuxtLink
           to="/dashboard/jobs"
-          class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-surface-500 hover:text-surface-700 transition-colors no-underline mb-2"
+          class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-surface-500 dark:text-surface-400 hover:text-surface-700 dark:hover:text-surface-200 transition-colors no-underline mb-2"
         >
           <ChevronLeft class="size-3.5" />
           All Jobs
@@ -96,9 +98,9 @@ function isActiveTab(to: string, exact: boolean) {
             v-for="tab in jobTabs"
             :key="tab.to"
             :to="tab.to"
-            class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-surface-600 hover:bg-surface-100 hover:text-surface-900 transition-colors no-underline"
+            class="flex items-center gap-2.5 px-3 py-2 rounded-md text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-900 dark:hover:text-surface-100 transition-colors no-underline"
             :class="isActiveTab(tab.to, tab.exact)
-              ? 'bg-brand-50 text-brand-700 font-medium'
+              ? 'bg-surface-100 dark:bg-surface-800 text-surface-900 dark:text-surface-100 font-medium'
               : ''"
           >
             <component :is="tab.icon" class="size-4 shrink-0" />
@@ -109,13 +111,21 @@ function isActiveTab(to: string, exact: boolean) {
     </div>
 
     <!-- Bottom -->
-    <div class="border-t border-surface-200 pt-4 flex flex-col gap-3">
+    <div class="border-t border-surface-200 dark:border-surface-800 pt-4 flex flex-col gap-3">
       <div class="px-2">
-        <div class="text-sm font-medium text-surface-900">{{ userName }}</div>
-        <div class="text-xs text-surface-500 truncate">{{ userEmail }}</div>
+        <div class="text-sm font-medium text-surface-900 dark:text-surface-100">{{ userName }}</div>
+        <div class="text-xs text-surface-500 dark:text-surface-400 truncate">{{ userEmail }}</div>
       </div>
       <button
-        class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-surface-600 hover:bg-surface-100 hover:text-surface-900 transition-colors cursor-pointer border-0 bg-transparent w-full text-left disabled:opacity-50 disabled:cursor-not-allowed"
+        class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-900 dark:hover:text-surface-100 transition-colors cursor-pointer border-0 bg-transparent w-full text-left"
+        @click="toggleColorMode"
+      >
+        <Sun v-if="isDark" class="size-4 shrink-0" />
+        <Moon v-else class="size-4 shrink-0" />
+        {{ isDark ? 'Light mode' : 'Dark mode' }}
+      </button>
+      <button
+        class="flex items-center gap-2 px-3 py-1.5 rounded-md text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-900 dark:hover:text-surface-100 transition-colors cursor-pointer border-0 bg-transparent w-full text-left disabled:opacity-50 disabled:cursor-not-allowed"
         :disabled="isSigningOut"
         @click="handleSignOut"
       >

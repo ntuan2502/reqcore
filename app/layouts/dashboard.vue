@@ -5,7 +5,7 @@ const { data: session } = await authClient.useSession(useFetch)
 <template>
   <div class="flex min-h-screen">
     <AppSidebar />
-    <main class="flex-1 overflow-y-auto bg-surface-50 px-6 py-8">
+    <main class="flex-1 overflow-y-auto bg-surface-50 dark:bg-surface-950 px-6 py-8">
       <slot />
     </main>
   </div>

@@ -18,9 +18,12 @@ async function handleSwitch(orgId: string) {
 }
 
 /** Close dropdown on outside click */
+const switcherRef = useTemplateRef<HTMLElement>('switcherRoot')
+
 function onClickOutside(e: MouseEvent) {
-  const el = (e.target as HTMLElement).closest('.org-switcher')
-  if (!el) isOpen.value = false
+  if (switcherRef.value && !switcherRef.value.contains(e.target as Node)) {
+    isOpen.value = false
+  }
 }
 
 onMounted(() => document.addEventListener('click', onClickOutside))
@@ -28,113 +31,43 @@ onUnmounted(() => document.removeEventListener('click', onClickOutside))
 </script>
 
 <template>
-  <div class="org-switcher">
-    <button class="org-trigger" @click="isOpen = !isOpen">
-      <span class="org-name">{{ activeOrg?.name ?? 'Select org' }}</span>
-      <span class="org-chevron">{{ isOpen ? '▲' : '▼' }}</span>
+  <div ref="switcherRoot" class="relative">
+    <button
+      class="flex items-center justify-between w-full px-3 py-2 bg-surface-100 dark:bg-surface-800 border border-surface-200 dark:border-surface-700 rounded-md cursor-pointer text-[13px] font-medium text-surface-900 dark:text-surface-100 text-left hover:bg-surface-200 dark:hover:bg-surface-700 transition-colors"
+      @click="isOpen = !isOpen"
+    >
+      <span class="truncate">{{ activeOrg?.name ?? 'Select org' }}</span>
+      <span class="text-[10px] text-surface-500 dark:text-surface-400">{{ isOpen ? '▲' : '▼' }}</span>
     </button>
 
-    <div v-if="isOpen" class="org-dropdown">
-      <div v-if="isSwitching" class="org-loading">Switching…</div>
+    <div
+      v-if="isOpen"
+      class="absolute top-[calc(100%+4px)] left-0 right-0 bg-white dark:bg-surface-900 border border-surface-200 dark:border-surface-700 rounded-md shadow-lg z-50 overflow-hidden"
+    >
+      <div v-if="isSwitching" class="px-3 py-3 text-center text-[13px] text-surface-500 dark:text-surface-400">
+        Switching…
+      </div>
       <template v-else>
         <button
           v-for="org in orgs"
           :key="org.id"
-          class="org-option"
-          :class="{ 'org-option--active': org.id === activeOrg?.id }"
+          class="block w-full px-3 py-2 bg-transparent border-0 text-[13px] text-surface-700 dark:text-surface-300 text-left cursor-pointer hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+          :class="org.id === activeOrg?.id
+            ? 'bg-brand-50 dark:bg-brand-950 text-brand-600 dark:text-brand-400 font-medium'
+            : ''"
           @click="handleSwitch(org.id)"
         >
           {{ org.name }}
         </button>
 
-        <NuxtLink to="/onboarding/create-org" class="org-option org-option--create" @click="isOpen = false">
+        <NuxtLink
+          to="/onboarding/create-org"
+          class="block w-full px-3 py-2 border-t border-surface-200 dark:border-surface-700 text-xs text-surface-500 dark:text-surface-400 text-left cursor-pointer no-underline hover:text-surface-900 dark:hover:text-surface-200 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+          @click="isOpen = false"
+        >
           + Create organization
         </NuxtLink>
       </template>
     </div>
   </div>
 </template>
-
-<style scoped>
-.org-switcher {
-  position: relative;
-}
-
-.org-trigger {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  background: #f3f4f6;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  cursor: pointer;
-  font-size: 0.8125rem;
-  font-weight: 500;
-  color: #111;
-  text-align: left;
-}
-
-.org-trigger:hover {
-  background: #e5e7eb;
-}
-
-.org-chevron {
-  font-size: 0.625rem;
-  color: #6b7280;
-}
-
-.org-dropdown {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  right: 0;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  z-index: 50;
-  overflow: hidden;
-}
-
-.org-loading {
-  padding: 0.75rem;
-  text-align: center;
-  font-size: 0.8125rem;
-  color: #6b7280;
-}
-
-.org-option {
-  display: block;
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  background: none;
-  border: none;
-  font-size: 0.8125rem;
-  color: #374151;
-  text-align: left;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-.org-option:hover {
-  background: #f9fafb;
-}
-
-.org-option--active {
-  background: #eff6ff;
-  color: #2563eb;
-  font-weight: 500;
-}
-
-.org-option--create {
-  border-top: 1px solid #e5e7eb;
-  color: #6b7280;
-  font-size: 0.75rem;
-}
-
-.org-option--create:hover {
-  color: #111;
-}
-</style>
