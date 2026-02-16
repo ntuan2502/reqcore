@@ -30,7 +30,15 @@ export default defineEventHandler(async (event) => {
   const [updated] = await db.update(candidate)
     .set({ ...body, updatedAt: new Date() })
     .where(and(eq(candidate.id, id), eq(candidate.organizationId, orgId)))
-    .returning()
+    .returning({
+      id: candidate.id,
+      firstName: candidate.firstName,
+      lastName: candidate.lastName,
+      email: candidate.email,
+      phone: candidate.phone,
+      createdAt: candidate.createdAt,
+      updatedAt: candidate.updatedAt,
+    })
 
   if (!updated) {
     throw createError({ statusCode: 404, statusMessage: 'Not found' })

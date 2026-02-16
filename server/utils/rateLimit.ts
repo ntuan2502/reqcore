@@ -102,22 +102,33 @@ export function createRateLimiter(config: RateLimitConfig) {
 
 /**
  * Extract the client IP from the request.
- * Checks common proxy headers first, falls back to the socket address.
  *
- * In production behind a reverse proxy (nginx, Cloudflare, etc.),
- * ensure the proxy sets X-Forwarded-For and that Nitro trusts it.
+ * Security: Does NOT trust proxy headers (X-Forwarded-For, X-Real-IP) by default
+ * because they are trivially spoofable by direct clients. Uses the socket remote
+ * address which cannot be forged at the application layer.
+ *
+ * If running behind a trusted reverse proxy (nginx, Cloudflare, etc.), configure
+ * the proxy to overwrite (not append to) X-Forwarded-For, then set the
+ * TRUSTED_PROXY_IP env var to enable header-based IP extraction.
  */
 function getClientIp(event: H3Event): string {
-  // X-Forwarded-For may contain a list: "client, proxy1, proxy2"
-  const forwarded = getHeader(event, 'x-forwarded-for')
-  if (forwarded) {
-    const firstIp = forwarded.split(',')[0]?.trim()
-    if (firstIp) return firstIp
+  // Only trust proxy headers when explicitly configured
+  const trustedProxy = process.env.TRUSTED_PROXY_IP
+  if (trustedProxy) {
+    const socketIp = getRequestIP(event)
+    if (socketIp === trustedProxy) {
+      // Request came from the trusted proxy — read the forwarded header
+      const forwarded = getHeader(event, 'x-forwarded-for')
+      if (forwarded) {
+        const firstIp = forwarded.split(',')[0]?.trim()
+        if (firstIp) return firstIp
+      }
+
+      const realIp = getHeader(event, 'x-real-ip')
+      if (realIp) return realIp
+    }
   }
 
-  const realIp = getHeader(event, 'x-real-ip')
-  if (realIp) return realIp
-
-  // Fallback to socket remote address
+  // Default: use the socket remote address (cannot be spoofed)
   return getRequestIP(event) ?? '0.0.0.0'
 }

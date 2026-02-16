@@ -18,6 +18,17 @@ export default defineEventHandler(async (event) => {
       limit: query.limit,
       offset,
       orderBy: [desc(job.createdAt)],
+      columns: {
+        id: true,
+        title: true,
+        slug: true,
+        description: true,
+        location: true,
+        type: true,
+        status: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     }),
     db.$count(job, and(...conditions)),
   ])

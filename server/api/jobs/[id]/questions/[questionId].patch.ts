@@ -19,7 +19,18 @@ export default defineEventHandler(async (event) => {
       eq(jobQuestion.jobId, jobId),
       eq(jobQuestion.organizationId, orgId),
     ))
-    .returning()
+    .returning({
+      id: jobQuestion.id,
+      jobId: jobQuestion.jobId,
+      type: jobQuestion.type,
+      label: jobQuestion.label,
+      description: jobQuestion.description,
+      required: jobQuestion.required,
+      options: jobQuestion.options,
+      displayOrder: jobQuestion.displayOrder,
+      createdAt: jobQuestion.createdAt,
+      updatedAt: jobQuestion.updatedAt,
+    })
 
   if (!updated) {
     throw createError({ statusCode: 404, statusMessage: 'Question not found' })

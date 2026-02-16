@@ -21,6 +21,18 @@ export default defineEventHandler(async (event) => {
   const questions = await db.query.jobQuestion.findMany({
     where: and(eq(jobQuestion.jobId, jobId), eq(jobQuestion.organizationId, orgId)),
     orderBy: [asc(jobQuestion.displayOrder), asc(jobQuestion.createdAt)],
+    columns: {
+      id: true,
+      jobId: true,
+      type: true,
+      label: true,
+      description: true,
+      required: true,
+      options: true,
+      displayOrder: true,
+      createdAt: true,
+      updatedAt: true,
+    },
   })
 
   return questions

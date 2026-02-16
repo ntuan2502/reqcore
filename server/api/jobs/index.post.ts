@@ -19,7 +19,17 @@ export default defineEventHandler(async (event) => {
     description: body.description,
     location: body.location,
     type: body.type,
-  }).returning()
+  }).returning({
+    id: job.id,
+    title: job.title,
+    slug: job.slug,
+    description: job.description,
+    location: job.location,
+    type: job.type,
+    status: job.status,
+    createdAt: job.createdAt,
+    updatedAt: job.updatedAt,
+  })
 
   setResponseStatus(event, 201)
   return created

@@ -56,7 +56,16 @@ export default defineEventHandler(async (event) => {
     jobId: body.jobId,
     notes: body.notes,
     status: 'new',
-  }).returning()
+  }).returning({
+    id: application.id,
+    candidateId: application.candidateId,
+    jobId: application.jobId,
+    status: application.status,
+    score: application.score,
+    notes: application.notes,
+    createdAt: application.createdAt,
+    updatedAt: application.updatedAt,
+  })
 
   setResponseStatus(event, 201)
   return created

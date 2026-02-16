@@ -30,7 +30,15 @@ export default defineEventHandler(async (event) => {
     lastName: body.lastName,
     email: body.email,
     phone: body.phone,
-  }).returning()
+  }).returning({
+    id: candidate.id,
+    firstName: candidate.firstName,
+    lastName: candidate.lastName,
+    email: candidate.email,
+    phone: candidate.phone,
+    createdAt: candidate.createdAt,
+    updatedAt: candidate.updatedAt,
+  })
 
   setResponseStatus(event, 201)
   return created

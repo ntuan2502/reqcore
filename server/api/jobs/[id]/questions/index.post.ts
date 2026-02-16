@@ -28,7 +28,18 @@ export default defineEventHandler(async (event) => {
     required: body.required,
     options: body.options,
     displayOrder: body.displayOrder,
-  }).returning()
+  }).returning({
+    id: jobQuestion.id,
+    jobId: jobQuestion.jobId,
+    type: jobQuestion.type,
+    label: jobQuestion.label,
+    description: jobQuestion.description,
+    required: jobQuestion.required,
+    options: jobQuestion.options,
+    displayOrder: jobQuestion.displayOrder,
+    createdAt: jobQuestion.createdAt,
+    updatedAt: jobQuestion.updatedAt,
+  })
 
   setResponseStatus(event, 201)
   return created
