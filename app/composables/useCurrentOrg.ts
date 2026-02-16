@@ -11,6 +11,7 @@ export function useCurrentOrg() {
   // ═══════════════════════════════════════════
   const orgListState = authClient.useListOrganizations()
   const orgs = computed(() => orgListState.value.data ?? [])
+  const isOrgsLoading = computed(() => orgListState.value.isPending ?? false)
 
   // ═══════════════════════════════════════════
   // 2. ACTIVE ORG — reactive hook from Better Auth
@@ -56,6 +57,7 @@ export function useCurrentOrg() {
   // ═══════════════════════════════════════════
   return {
     orgs,
+    isOrgsLoading,
     activeOrg,
     switchOrg,
     createOrg,
