@@ -7,6 +7,13 @@ export default defineNuxtConfig({
 
   css: ['~/assets/css/main.css'],
 
+  runtimeConfig: {
+    public: {
+      /** When set, the dashboard shows a read-only demo banner for this org slug */
+      demoOrgSlug: process.env.DEMO_ORG_SLUG || '',
+    },
+  },
+
   vite: {
     // @ts-expect-error - Vite version mismatch between @tailwindcss/vite and Nuxt's bundled Vite
     plugins: [tailwindcss()],
