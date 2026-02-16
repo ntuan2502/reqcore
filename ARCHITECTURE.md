@@ -2,7 +2,7 @@
 
 ## Overview
 
-Applirank is a **Nuxt 4** full-stack application following a monolithic architecture with clear separation between client (`app/`) and server (`server/`) code. The system is designed for **self-hosted deployment** using Docker Compose.
+Applirank is a **Nuxt 4** full-stack application following a monolithic architecture with clear separation between client (`app/`) and server (`server/`) code. The system is designed for **self-hosted deployment** on a VPS with Docker Compose for infrastructure services.
 
 ## Technology Stack
 
@@ -18,6 +18,9 @@ Applirank is a **Nuxt 4** full-stack application following a monolithic architec
 | Object Storage | MinIO (S3-compatible) | Resume/document storage |
 | Validation | Zod v4 | Schema validation (server + client) |
 | Infrastructure | Docker Compose | Local dev + self-hosted deployment |
+| Reverse Proxy | Caddy | Auto-HTTPS, reverse proxy to Nitro |
+| CDN | Cloudflare (Free) | DNS, DDoS protection, edge caching |
+| Hosting | Hetzner Cloud (CX23) | 2 vCPU, 4GB RAM, Ubuntu 24.04 |
 
 ## Directory Structure
 
@@ -79,7 +82,7 @@ applirank/
 │       ├── db.ts                 # Drizzle client + connection pool
 │       ├── env.ts                # Zod-validated environment variables
 │       ├── requireAuth.ts        # Auth guard (throws 401/403)
-│       ├── s3.ts                 # S3/MinIO client, upload, delete, presigned URLs
+│       ├── s3.ts                 # S3/MinIO client, upload, delete, bucket policy
 │       ├── slugify.ts            # URL slug generation for public job pages
 │       ├── rateLimit.ts          # IP-based sliding window rate limiter
 │       └── schemas/              # Shared Zod validation schemas
@@ -106,31 +109,45 @@ applirank/
 │  │  • useFetch / $fetch → /api/*                │   │
 │  └──────────────────┬───────────────────────────┘   │
 └─────────────────────┼───────────────────────────────┘
-                      │ HTTP
+                      │ HTTPS
 ┌─────────────────────┼───────────────────────────────┐
-│  Nitro Server       │                                │
+│  Cloudflare CDN     │                                │
+│  • DNS + DDoS protection                            │
+│  • Edge caching + SSL termination                   │
+│  • AI bot blocking                                  │
+└─────────────────────┼───────────────────────────────┘
+                      │ HTTPS
+┌─────────────────────┼───────────────────────────────┐
+│  Hetzner VPS (Ubuntu 24.04)                          │
 │  ┌──────────────────▼───────────────────────────┐   │
-│  │  API Routes (server/api/)                     │   │
-│  │  • Auth guard: requireAuth(event)             │   │
-│  │  • Validation: Zod v4 schemas                 │   │
-│  │  • Org scoping: session.activeOrganizationId  │   │
-│  └────┬──────────────────┬──────────────────────┘   │
-│       │                  │                           │
-│  ┌────▼────┐    ┌───────▼────────┐                  │
-│  │ Drizzle │    │  Better Auth   │                  │
-│  │  ORM    │    │  (sessions,    │                  │
-│  │         │    │   orgs, users) │                  │
-│  └────┬────┘    └───────┬────────┘                  │
-└───────┼─────────────────┼───────────────────────────┘
-        │                 │
-┌───────▼─────────────────▼───────────────────────────┐
-│  Docker Compose Infrastructure                       │
-│  ┌──────────┐  ┌──────────┐  ┌──────────┐          │
-│  │ Postgres │  │  MinIO   │  │ Adminer  │          │
-│  │  :5432   │  │  :9000   │  │  :8080   │          │
-│  │          │  │  :9001   │  │          │          │
-│  └──────────┘  └──────────┘  └──────────┘          │
-└─────────────────────────────────────────────────────┘
+│  │  Caddy (reverse proxy, auto-TLS)              │   │
+│  │  :80 / :443 → 127.0.0.1:3000                 │   │
+│  └──────────────────┬───────────────────────────┘   │
+│  ┌──────────────────▼───────────────────────────┐   │
+│  │  Nitro Server (:3000)                         │   │
+│  │  ┌──────────────────────────────────────┐     │   │
+│  │  │  API Routes (server/api/)             │     │   │
+│  │  │  • Auth guard: requireAuth(event)     │     │   │
+│  │  │  • Validation: Zod v4 schemas         │     │   │
+│  │  │  • Org scoping: activeOrganizationId  │     │   │
+│  │  └────┬──────────────────┬───────────────┘     │   │
+│  │       │                  │                     │   │
+│  │  ┌────▼────┐    ┌───────▼────────┐             │   │
+│  │  │ Drizzle │    │  Better Auth   │             │   │
+│  │  │  ORM    │    │  (sessions,    │             │   │
+│  │  │         │    │   orgs, users) │             │   │
+│  │  └────┬────┘    └───────┬────────┘             │   │
+│  └───────┼─────────────────┼──────────────────────┘   │
+│          │                 │                           │
+│  ┌───────▼─────────────────▼───────────────────────┐  │
+│  │  Docker Compose Infrastructure                   │  │
+│  │  ┌──────────┐  ┌──────────┐  ┌──────────┐       │  │
+│  │  │ Postgres │  │  MinIO   │  │ Adminer  │       │  │
+│  │  │  :5432   │  │  :9000   │  │  :8080   │       │  │
+│  │  │          │  │  :9001   │  │          │       │  │
+│  │  └──────────┘  └──────────┘  └──────────┘       │  │
+│  └─────────────────────────────────────────────────┘  │
+└───────────────────────────────────────────────────────┘
 ```
 
 ## Key Architectural Decisions
@@ -177,13 +194,13 @@ Documents (resumes, cover letters) are stored in MinIO, an S3-compatible object 
 Document access is **always server-proxied** — both download and preview endpoints stream file bytes through the authenticated Nitro server. Presigned S3 URLs are never exposed to clients, preventing URL sharing or leakage of sensitive candidate data.
 
 Key security measures:
-- **Private bucket policy**: An explicit deny-all-anonymous-access policy is enforced on every startup (`server/plugins/s3-bucket.ts`)
+- **Private bucket policy**: Any public bucket policy is deleted on every startup (`server/plugins/s3-bucket.ts`), ensuring the bucket stays private (MinIO buckets with no policy deny anonymous access by default)
 - **Filename sanitization**: All user-provided filenames are sanitized via `sanitizeFilename()` before storage, preventing path traversal, XSS, and filesystem exploits
 - **MIME validation**: Upload endpoints validate file types using magic bytes (`file-type` package), not just the `Content-Type` header
 - **Per-candidate document limits**: Max 20 documents per candidate, enforced on public apply endpoint
 - **`storageKey` never exposed**: API responses filter out the internal S3 key
 - **Preview restricted to PDF**: Only `application/pdf` files can be previewed inline; DOC/DOCX (which can contain macros) must be downloaded
-- **Cache headers**: `Cache-Control: private, max-age=300` on preview, `private, no-store` on download
+- **Cache headers**: `Cache-Control: private, no-store` on both download and preview
 - **X-Frame-Options**: Global `DENY` with `SAMEORIGIN` override for the preview endpoint only
 
 ## Data Model
@@ -224,7 +241,36 @@ Public-facing endpoints live under `server/api/public/` and require no authentic
 | Document upload | MIME validation via magic bytes, filename sanitization, per-candidate limits |
 | Security headers | Global Nitro route rules: `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `X-XSS-Protection`, `Permissions-Policy` |
 | Environment secrets | Validated at startup, never exposed to client |
+## Deployment Architecture
 
+Applirank runs on a single **Hetzner Cloud CX23** VPS (2 vCPU, 4GB RAM, Ubuntu 24.04) with **Cloudflare** as CDN/DNS:
+
+| Component | Role |
+|-----------|------|
+| Cloudflare (Free) | DNS, DDoS protection, SSL edge termination, AI bot blocking |
+| Caddy | Reverse proxy with auto-TLS, listens on :80/:443 |
+| Node.js (Nitro) | SSR app on :3000 (localhost only) |
+| Docker Compose | Postgres + MinIO (localhost only) |
+| systemd | Process manager — auto-restarts app on crash/reboot |
+| UFW | Firewall — only ports 22, 80, 443 open |
+
+### Deploy Workflow
+
+```bash
+# From local machine after pushing to GitHub:
+ssh -i ~/.ssh/hetzner deploy@<server-ip> '~/deploy.sh'
+
+# deploy.sh runs: git pull → npm install → npm run build → systemctl restart
+```
+
+### Key Files on Server
+
+| File | Purpose |
+|------|--------|
+| `/home/deploy/applirank/.env` | Environment variables (loaded by systemd) |
+| `/etc/systemd/system/applirank.service` | systemd unit file |
+| `/etc/caddy/Caddyfile` | Caddy reverse proxy config |
+| `/home/deploy/deploy.sh` | One-command deploy script |
 ## Local Development Services
 
 | Service | URL | Purpose |

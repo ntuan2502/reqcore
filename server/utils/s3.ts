@@ -81,11 +81,12 @@ export async function bucketExists(): Promise<boolean> {
 }
 
 /**
- * Create the configured bucket if it doesn't exist, then enforce a
- * private-only access policy. Idempotent — safe to call repeatedly.
+ * Create the configured bucket if it doesn't exist, then enforce
+ * private access by deleting any public policy. Idempotent — safe
+ * to call repeatedly.
  *
- * Security: Explicitly denies all anonymous access even if someone
- * manually changes the policy via the MinIO console.
+ * Security: MinIO buckets without a policy are private by default.
+ * We delete any existing policy to ensure no accidental public access.
  */
 export async function ensureBucketExists(): Promise<void> {
   if (!(await bucketExists())) {

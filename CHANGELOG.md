@@ -6,6 +6,25 @@ Format follows [Keep a Changelog](https://keepachangelog.com). Categories: **Add
 
 ---
 
+## 2026-02-16
+
+### Added
+
+- **Production deployment** — deployed to Hetzner Cloud CX23 (2 vCPU, 4GB RAM, Ubuntu 24.04) with Caddy reverse proxy, systemd service management, and one-command deploy script (`~/deploy.sh`)
+- **Cloudflare CDN** — DNS, DDoS protection, edge caching, SSL termination (Full strict mode), and AI training bot blocking via Cloudflare Free plan
+- **Deploy workflow** — `ssh deploy@server '~/deploy.sh'` pulls latest code, installs deps, builds, and restarts the systemd service
+- **UFW firewall** — only ports 22 (SSH), 80 (HTTP), 443 (HTTPS) open
+
+### Fixed
+
+- **S3 bucket policy MinIO compatibility** — replaced `PutBucketPolicy` with `DeleteBucketPolicy` because MinIO doesn't support the `aws:PrincipalType` condition key used in the deny-anonymous policy; buckets without a policy are private by default in MinIO
+
+### Changed
+
+- **S3 bucket privacy strategy** — instead of setting an explicit deny-all policy (which used AWS-only condition keys), the startup plugin now deletes any existing bucket policy to ensure MinIO's default private behavior
+
+---
+
 ## 2026-02-15
 
 ### Added

@@ -22,6 +22,9 @@ Applirank is the **Glass Box** alternative to Black Box incumbents. No per-seat 
 | Object Storage | [MinIO](https://min.io) (S3-compatible) |
 | Validation | [Zod v4](https://zod.dev) |
 | Infrastructure | Docker Compose |
+| Reverse Proxy | [Caddy](https://caddyserver.com) (auto-HTTPS) |
+| CDN | [Cloudflare](https://cloudflare.com) (Free plan) |
+| Hosting | [Hetzner Cloud](https://hetzner.com/cloud) (CX23) |
 
 ## Getting Started
 
@@ -105,6 +108,27 @@ server/
   plugins/            # Server lifecycle plugins
 docker-compose.yml    # Local infrastructure
 ```
+
+## Deployment
+
+Applirank runs on a Hetzner Cloud CX23 VPS (2 vCPU, 4GB RAM, Ubuntu 24.04) with Cloudflare CDN in front.
+
+| Component | Role |
+|-----------|------|
+| Cloudflare | DNS, DDoS protection, edge SSL |
+| Caddy | Reverse proxy with auto-TLS |
+| systemd | Process management (auto-restart) |
+| Docker Compose | Postgres + MinIO |
+
+### Deploy updates
+
+After pushing to GitHub:
+
+```bash
+ssh -i ~/.ssh/hetzner deploy@<server-ip> '~/deploy.sh'
+```
+
+The deploy script pulls, installs, builds, and restarts the app.
 
 For full architecture details, see [ARCHITECTURE.md](ARCHITECTURE.md).
 

@@ -19,6 +19,7 @@ Applirank is a **Nuxt 4** full-stack application using the `app/` directory stru
 - **Object Storage**: MinIO (S3-compatible), accessed via S3 API
 - **Validation**: Zod v4
 - **Infrastructure**: Docker Compose for local Postgres, MinIO, and Adminer
+- **Deployment**: Hetzner Cloud CX23 VPS, Caddy reverse proxy, Cloudflare CDN, systemd
 
 ## Product Vision: The Sovereign Recruitment Engine
 

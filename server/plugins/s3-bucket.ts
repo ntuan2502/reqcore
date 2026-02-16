@@ -1,5 +1,5 @@
 /**
- * Ensures the S3 bucket exists and is configured with a private policy on startup.
+ * Ensures the S3 bucket exists and is configured as private on startup.
  * Runs after migrations plugin. Idempotent — safe to run repeatedly.
  */
 export default defineNitroPlugin(async () => {
