@@ -1,16 +1,29 @@
 import { z } from 'zod'
 
+/**
+ * Preprocessor that normalizes empty strings to undefined.
+ * Railway and some platforms may set env vars to "" instead of leaving them unset.
+ * This ensures `.default()` and `.optional()` work as expected.
+ */
+const emptyToUndefined = z.preprocess(
+  (val) => (typeof val === 'string' && val.trim() === '' ? undefined : val),
+  z.string(),
+)
+
 const envSchema = z.object({
   DATABASE_URL: z.url(),
-  BETTER_AUTH_SECRET: z.string().min(32, 'BETTER_AUTH_SECRET must be at least 32 characters'),
+  BETTER_AUTH_SECRET: emptyToUndefined.pipe(z.string().min(32, 'BETTER_AUTH_SECRET must be at least 32 characters')),
   BETTER_AUTH_URL: z.url(),
   S3_ENDPOINT: z.url(),
-  S3_ACCESS_KEY: z.string().min(1),
-  S3_SECRET_KEY: z.string().min(1),
-  S3_BUCKET: z.string().min(1),
-  S3_REGION: z.string().min(1).default('us-east-1'),
+  S3_ACCESS_KEY: emptyToUndefined.pipe(z.string().min(1)),
+  S3_SECRET_KEY: emptyToUndefined.pipe(z.string().min(1)),
+  S3_BUCKET: emptyToUndefined.pipe(z.string().min(1)),
+  S3_REGION: emptyToUndefined.pipe(z.string().min(1)).optional().default('us-east-1'),
   /** Use path-style S3 URLs. Required for MinIO (local dev), must be `false` for Railway Buckets / AWS S3. */
-  S3_FORCE_PATH_STYLE: z.string().transform(v => v === 'true').default('true'),
+  S3_FORCE_PATH_STYLE: z.preprocess(
+    (val) => (typeof val === 'string' && val.trim() === '' ? undefined : val === 'true' || val === undefined),
+    z.boolean().default(true),
+  ),
   /** IP address of the trusted reverse proxy (e.g., Railway, Cloudflare). When set, X-Forwarded-For is trusted for rate limiting. */
   TRUSTED_PROXY_IP: z.string().min(1).optional(),
   /** Slug of the demo organization. When set, write operations are blocked for this org. */
@@ -29,14 +42,33 @@ const envSchema = z.object({
  * during the build phase).
  */
 export const env = new Proxy({} as z.infer<typeof envSchema>, {
-  get(_, prop: string) {
+  get(_, prop: string | symbol) {
     // During build-time prerendering, env vars aren't available.
     // Return safe defaults so the prerenderer can boot without crashing.
     if (import.meta.prerender) {
       return ''
     }
+
+    if (typeof prop === 'symbol') return undefined
+
     // Parse once on first access, then cache for all subsequent reads
-    const parsed = (globalThis as Record<string, unknown>).__env ??= envSchema.parse(process.env)
-    return (parsed as Record<string, unknown>)[prop]
+    if (!(globalThis as Record<string, unknown>).__env) {
+      const result = envSchema.safeParse(process.env)
+      if (!result.success) {
+        const missing = result.error.issues
+          .map(i => `  - ${i.path.join('.')}: ${i.message}`)
+          .join('\n')
+        console.error(
+          `\n[Applirank] ❌ Missing or invalid environment variables:\n${missing}\n\n` +
+          `Ensure these variables are set in your Railway service (Settings → Variables).\n` +
+          `Required: DATABASE_URL, BETTER_AUTH_SECRET, BETTER_AUTH_URL, S3_ENDPOINT, S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET\n` +
+          `Optional: S3_REGION (default: us-east-1), S3_FORCE_PATH_STYLE (default: true), TRUSTED_PROXY_IP, DEMO_ORG_SLUG\n`,
+        )
+        throw result.error
+      }
+      ;(globalThis as Record<string, unknown>).__env = result.data
+    }
+
+    return ((globalThis as Record<string, unknown>).__env as Record<string, unknown>)[prop]
   },
 })
