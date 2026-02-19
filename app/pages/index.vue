@@ -87,8 +87,9 @@ async function tryDemo() {
     // Activate the demo org before navigating
     const orgsResult = await authClient.organization.list()
     const orgs = orgsResult.data
-    if (orgs && orgs.length > 0) {
-      await authClient.organization.setActive({ organizationId: orgs[0].id })
+    const firstOrg = orgs?.[0]
+    if (firstOrg?.id) {
+      await authClient.organization.setActive({ organizationId: firstOrg.id })
     }
 
     // Hard navigation to avoid hydration mismatches between dark landing and light dashboard
@@ -126,6 +127,12 @@ async function tryDemo() {
             class="hidden rounded-md px-3 py-1.5 text-[13px] font-medium text-surface-400 transition hover:text-white sm:inline-flex"
           >
             Roadmap
+          </NuxtLink>
+          <NuxtLink
+            to="/features"
+            class="hidden rounded-md px-3 py-1.5 text-[13px] font-medium text-surface-400 transition hover:text-white sm:inline-flex"
+          >
+            Features
           </NuxtLink>
           <NuxtLink
             to="/blog"

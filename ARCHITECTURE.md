@@ -18,7 +18,7 @@ Applirank is a **Nuxt 4** full-stack application following a monolithic architec
 | Object Storage | S3-compatible (Railway Buckets / MinIO) | Resume/document storage |
 | Validation | Zod v4 | Schema validation (server + client) |
 | SEO | `@nuxtjs/seo` (Sitemap, Robots, Schema.org, SEO Utils, Site Config) | Search engine optimization, structured data |
-| Content | `@nuxt/content` v3 | Markdown blog engine with typed collections |
+| Content | `@nuxt/content` v3 | Markdown content engine (blog + hierarchical features) with typed collections |
 | Infrastructure | Docker Compose (local dev) | Local Postgres, MinIO, Adminer |
 | Hosting | Railway | Managed platform (auto-build, auto-deploy) |
 | CDN | Cloudflare (Free) | DNS, DDoS protection, edge caching |
@@ -32,7 +32,8 @@ applirank/
 │   ├── assets/
 │   │   └── css/main.css           # Tailwind CSS entry point + @theme tokens
 │   ├── components/               # Auto-imported Vue components
-│   │   └── AppSidebar.vue        # Main sidebar with dynamic job context nav
+│   │   ├── AppSidebar.vue        # Main sidebar with dynamic job context nav
+│   │   └── GiscusComments.client.vue # Client-only comments embed for feature pages
 │   ├── composables/              # Auto-imported composables (useXxx)
 │   ├── layouts/                  # Layout components
 │   │   ├── dashboard.vue         # Sidebar + full-width main (pages set own max-w + mx-auto)
@@ -42,6 +43,9 @@ applirank/
 │   ├── pages/                    # File-based routing
 │   │   ├── index.vue             # Public landing page (dark theme)
 │   │   ├── roadmap.vue           # Public roadmap (horizontal timeline)
+│   │   ├── features/
+│   │   │   ├── index.vue         # Public feature hierarchy listing (Markdown-driven)
+│   │   │   └── [...slug].vue     # Feature detail/sub-item page with comments
 │   │   ├── blog/
 │   │   │   ├── index.vue         # Blog listing (dark theme)
 │   │   │   └── [...slug].vue     # Blog article detail (dark theme, prose)
@@ -95,7 +99,8 @@ applirank/
 │           ├── candidate.ts      # Candidate schemas
 │           └── application.ts    # Application schemas
 ├── content/                      # Markdown content (@nuxt/content v3)
-│   └── blog/                     # Blog articles (*.md with YAML frontmatter)
+│   ├── blog/                     # Blog articles (*.md with YAML frontmatter)
+│   └── features/                 # Hierarchical feature docs (*.md)
 ├── public/                       # Static assets
 ├── docker-compose.yml            # Postgres + MinIO + Adminer
 ├── drizzle.config.ts             # Drizzle Kit configuration
@@ -218,7 +223,7 @@ When a page file `pages/[id].vue` and a directory `pages/[id]/` coexist, Nuxt tr
 
 ### 9. Public vs Authenticated Routes
 
-Public-facing endpoints live under `server/api/public/` and require no authentication. They only expose data for resources in an `open` state (e.g., jobs). Public pages live under `app/pages/jobs/` and use the `public` layout. The landing page (`app/pages/index.vue`), roadmap page (`app/pages/roadmap.vue`), and blog pages (`app/pages/blog/`) are also public — they use the dark theme with no layout.
+Public-facing endpoints live under `server/api/public/` and require no authentication. They only expose data for resources in an `open` state (e.g., jobs). Public pages live under `app/pages/jobs/` and use the `public` layout. The landing page (`app/pages/index.vue`), roadmap page (`app/pages/roadmap.vue`), features pages (`app/pages/features/`), and blog pages (`app/pages/blog/`) are also public — they use the dark theme with no layout.
 
 ### 10. SEO & Structured Data
 
@@ -230,7 +235,7 @@ Applirank uses `@nuxtjs/seo` for comprehensive search engine optimization:
 | **Robots** | Blocks `/dashboard/`, `/auth/`, `/api/`, `/onboarding/` from crawlers |
 | **Schema.org** | JSON-LD structured data on public pages (auto-imported composables) |
 | **Meta tags** | Full OG + Twitter Card meta on all public pages via `useSeoMeta()` |
-| **Route rules** | ISR for `/jobs/**` (3600s), prerender for `/`, `/roadmap`, `/blog/**` |
+| **Route rules** | ISR for `/jobs/**` (3600s), prerender for `/`, `/roadmap`, `/features/**`, `/blog/**` |
 
 Structured data by page type:
 - **Landing page**: `Organization` + `WebSite` + `WebPage`
@@ -239,13 +244,19 @@ Structured data by page type:
 
 Private pages (dashboard, auth, onboarding) include `robots: 'noindex, nofollow'` via `useSeoMeta()`.
 
-### 11. Blog Content Engine
+### 11. Markdown Content Engines
 
 Blog articles are Markdown files in `content/blog/` powered by `@nuxt/content` v3:
 - Collection schema defined in `content.config.ts` with typed frontmatter (title, description, date, author, image, tags)
 - Queried via `queryCollection('blog')` composable (auto-imported)
 - Rendered with `<ContentRenderer :value="post" />` and `@tailwindcss/typography` prose styling
 - Blog pages use the same dark theme as landing/roadmap
+
+Feature hierarchy pages are Markdown files in `content/features/` powered by `@nuxt/content` v3:
+- Collection schema in `content.config.ts` with `status`, `type`, `order`, and optional `tags`
+- Public listing page (`/features`) builds parent/child hierarchy from folder and path structure
+- Feature detail pages (`/features/**`) render markdown and direct child sub-items
+- Page-level discussion uses Giscus via `app/components/GiscusComments.client.vue`
 
 ## Security Boundaries
 

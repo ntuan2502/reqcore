@@ -65,7 +65,7 @@ const tree = computed<FeatureNode[]>(() => {
   const map = new Map<string, FeatureNode>()
 
   for (const doc of docs) {
-    const slug = doc.path.replace('/features/', '').split('/')[0]
+    const slug = doc.path.replace('/features/', '').split('/')[0] || 'uncategorized'
 
     if (!map.has(slug)) {
       map.set(slug, {
@@ -204,6 +204,13 @@ const tree = computed<FeatureNode[]>(() => {
       <section v-else class="rounded-2xl border border-white/[0.08] bg-white/[0.02] p-8 text-center">
         <Star class="mx-auto size-6 text-white/40" />
         <p class="mt-3 text-sm text-white/60">No feature documents found yet in <span class="font-medium text-white">content/features</span>.</p>
+      </section>
+
+      <section class="mt-8">
+        <p class="mb-3 text-xs text-white/40">
+          Comments are page-specific and map to each feature URL.
+        </p>
+        <GiscusComments />
       </section>
     </main>
   </div>

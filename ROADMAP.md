@@ -1,6 +1,6 @@
 # Applirank — Roadmap
 
-> Last updated: 2026-02-15 (public roadmap page)
+> Last updated: 2026-02-19 (feature hierarchy + public comments)
 >
 > This is the single source of truth for what's built, what's in progress, and what's planned.
 > For product vision see [PRODUCT.md](PRODUCT.md). For architecture see [ARCHITECTURE.md](ARCHITECTURE.md).
@@ -11,7 +11,7 @@
 
 **Phase 2, Milestone 9: Resume Parsing** — Extract structured data from uploaded resumes.
 
-> **Recently completed**: Dashboard — At-a-glance overview for recruiters with stat cards, pipeline breakdown, recent applications, top active jobs, and quick actions.
+> **Recently completed**: Public Feature System — Markdown-driven hierarchical feature pages with Giscus comments.
 
 ---
 
@@ -81,6 +81,19 @@ Cinematic horizontal-scrolling roadmap page showing product progress.
 - [x] Auth-aware navbar matching landing page
 - [x] Dark theme consistent with landing page (`#09090b`, glass borders, ambient glow blobs)
 - [x] Linked from landing page navbar, footer, and roadmap showcase section
+
+### Milestone 2.7: Public Feature System ✅
+
+Notion-style feature hierarchy managed in Markdown from VS Code and rendered publicly.
+
+- [x] New `features` content collection in `content.config.ts` with typed frontmatter (`status`, `type`, `order`, `tags`)
+- [x] Hierarchical feature markdown source in `content/features/**`
+- [x] Public feature listing page (`app/pages/features/index.vue`) with parent + sub-item tree rendering
+- [x] Feature detail/sub-item page (`app/pages/features/[...slug].vue`) with breadcrumb + child links
+- [x] Giscus comments component (`app/components/GiscusComments.client.vue`) for page-level discussions
+- [x] Runtime-configurable Giscus env vars in `nuxt.config.ts`
+- [x] Route prerender rules for `/features` and `/features/**`
+- [x] Public nav links to Features on landing, roadmap, and blog pages
 
 ### Milestone 3: Job Management ✅
 
@@ -300,7 +313,7 @@ Goal: Ready for real teams to self-host in production.
 - [x] Public API exposes organization name for job listings (for `hiringOrganization` in JSON-LD)
 - [x] Full OG + Twitter Card meta on all public pages (landing, job board, job detail, roadmap, blog)
 - [x] `noindex` on private pages (auth, onboarding, apply form, confirmation)
-- [x] ISR route rules — `/jobs/**` (3600s), prerender `/`, `/roadmap`, `/blog/**`
+- [x] ISR route rules — `/jobs/**` (3600s), prerender `/`, `/roadmap`, `/features/**`, `/blog/**`
 - [x] Landing page H1 + copy optimized for "open source ATS" / "applicant tracking system" keywords
 - [x] Blog seed article: "Self-Hosted vs Cloud ATS: Pros, Cons, and When to Switch"
 - [x] Blog listing + detail pages with dark theme, navigation links
@@ -317,6 +330,7 @@ Goal: Ready for real teams to self-host in production.
 | 2. Auth UI & Navigation | 2026-02-14 |
 | 2.5. Public Landing Page | 2026-02-14 |
 | 2.6. Public Roadmap Page | 2026-02-15 |
+| 2.7. Public Feature System | 2026-02-19 |
 | 3. Job Management | 2026-02-14 |
 | 7a. Custom Application Forms & Public Submission | 2026-02-14 |
 | 7b. Public Job Board | 2026-02-14 |

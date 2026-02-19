@@ -3,6 +3,7 @@ const route = useRoute()
 const runtimeConfig = useRuntimeConfig()
 
 const containerRef = useTemplateRef<HTMLDivElement>('container')
+const loadError = ref('')
 
 const giscusConfig = computed(() => ({
   repo: runtimeConfig.public.giscusRepo,
@@ -29,6 +30,7 @@ function renderGiscus() {
   const container = containerRef.value
   if (!container) return
 
+  loadError.value = ''
   container.innerHTML = ''
 
   if (!isConfigured.value) return
@@ -49,6 +51,20 @@ function renderGiscus() {
   script.setAttribute('data-input-position', giscusConfig.value.inputPosition)
   script.setAttribute('data-theme', giscusConfig.value.theme)
   script.setAttribute('data-lang', giscusConfig.value.lang)
+  script.setAttribute('data-loading', 'lazy')
+
+  script.addEventListener('error', () => {
+    loadError.value = 'Could not load giscus.app. Check network/ad blockers and try again.'
+  })
+
+  script.addEventListener('load', () => {
+    window.setTimeout(() => {
+      const hasIframe = !!container.querySelector('iframe')
+      if (!hasIframe) {
+        loadError.value = 'Giscus loaded but did not render. Verify repo/category IDs and restart the dev server after env changes.'
+      }
+    }, 1500)
+  })
 
   container.appendChild(script)
 }
@@ -74,6 +90,13 @@ watch(() => route.fullPath, () => {
       class="rounded-lg border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-200/90"
     >
       Configure Giscus env vars to enable page comments.
+    </div>
+
+    <div
+      v-else-if="loadError"
+      class="rounded-lg border border-amber-400/20 bg-amber-400/10 px-4 py-3 text-sm text-amber-200/90"
+    >
+      {{ loadError }}
     </div>
 
     <div ref="container" />

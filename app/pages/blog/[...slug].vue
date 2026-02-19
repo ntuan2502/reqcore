@@ -67,6 +67,7 @@ const { data: session } = await authClient.useSession(useFetch)
         <NuxtLink to="/" class="text-[15px] font-semibold tracking-tight">Applirank</NuxtLink>
         <div class="flex items-center gap-5 text-[13px] text-white/60">
           <NuxtLink to="/roadmap" class="transition hover:text-white">Roadmap</NuxtLink>
+          <NuxtLink to="/features" class="transition hover:text-white">Features</NuxtLink>
           <NuxtLink to="/blog" class="text-white transition">Blog</NuxtLink>
           <a
             href="https://github.com/joachimhorsworthy/applirank"
@@ -168,6 +169,7 @@ const { data: session } = await authClient.useSession(useFetch)
         <div class="flex items-center gap-4">
           <NuxtLink to="/" class="transition hover:text-white/60">Home</NuxtLink>
           <NuxtLink to="/roadmap" class="transition hover:text-white/60">Roadmap</NuxtLink>
+          <NuxtLink to="/features" class="transition hover:text-white/60">Features</NuxtLink>
           <a
             href="https://github.com/joachimhorsworthy/applirank"
             target="_blank"
