@@ -40,6 +40,21 @@ const activeJobId = computed(() => {
   return null
 })
 
+const showJobsList = computed(() => {
+  return !activeJobId.value
+})
+
+const {
+  data: sidebarJobsData,
+  status: sidebarJobsStatus,
+} = useFetch('/api/jobs', {
+  key: 'sidebar-jobs-list',
+  query: { limit: 100 },
+  headers: useRequestHeaders(['cookie']),
+})
+
+const sidebarJobs = computed(() => sidebarJobsData.value?.data ?? [])
+
 const jobTabs = computed(() => {
   if (!activeJobId.value) return []
   const base = `/dashboard/jobs/${activeJobId.value}`
@@ -60,7 +75,7 @@ function isActiveTab(to: string, exact: boolean) {
 
 <template>
   <aside
-    class="flex flex-col justify-between w-60 min-w-60 bg-white dark:bg-surface-900 border-r border-surface-200 dark:border-surface-800 py-5 px-3 overflow-y-auto"
+    class="sticky top-0 self-start flex h-screen max-h-screen flex-col justify-between w-60 min-w-60 bg-white dark:bg-surface-900 border-r border-surface-200 dark:border-surface-800 py-5 px-3 overflow-y-auto"
   >
     <!-- Top -->
     <div class="flex flex-col gap-5">
@@ -89,6 +104,32 @@ function isActiveTab(to: string, exact: boolean) {
       </nav>
 
       <!-- Job context sub-nav (when viewing a specific job) -->
+      <div v-if="showJobsList" class="border-t border-surface-200 dark:border-surface-800 pt-4">
+        <div class="px-3 pb-2 text-xs font-medium uppercase tracking-wide text-surface-500 dark:text-surface-400">
+          Jobs
+        </div>
+
+        <div v-if="sidebarJobsStatus === 'pending'" class="px-3 py-2 text-xs text-surface-400">
+          Loading jobs…
+        </div>
+
+        <nav v-else class="flex max-h-56 flex-col gap-0.5 overflow-y-auto">
+          <NuxtLink
+            v-for="job in sidebarJobs"
+            :key="job.id"
+            :to="`/dashboard/jobs/${job.id}`"
+            class="px-3 py-2 rounded-md text-sm text-surface-600 dark:text-surface-400 hover:bg-surface-100 dark:hover:bg-surface-800 hover:text-surface-900 dark:hover:text-surface-100 transition-colors no-underline truncate"
+            :title="job.title"
+          >
+            {{ job.title }}
+          </NuxtLink>
+
+          <div v-if="sidebarJobs.length === 0" class="px-3 py-2 text-xs text-surface-400">
+            No jobs yet
+          </div>
+        </nav>
+      </div>
+
       <div v-if="activeJobId" class="border-t border-surface-200 dark:border-surface-800 pt-4">
         <NuxtLink
           to="/dashboard/jobs"

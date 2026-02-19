@@ -507,10 +507,10 @@ const isLoading = computed(() => {
                 <button
                   v-for="status in PIPELINE_STATUSES"
                   :key="`focus-bottom-${status}`"
-                  class="inline-flex min-h-8 shrink-0 cursor-pointer items-center rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors"
+                  class="inline-flex min-h-8 shrink-0 cursor-pointer items-center rounded-lg border px-2.5 py-1 text-[11px] font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-300 dark:focus-visible:ring-surface-600"
                   :class="[
                     isFocusStatus(status)
-                      ? 'border-brand-500 ring-2 ring-brand-500/30'
+                      ? 'border-brand-500'
                       : '',
                     isFocusStatus(status)
                       ? statusBadgeClasses[status]
@@ -534,10 +534,10 @@ const isLoading = computed(() => {
                   v-for="status in PIPELINE_STATUSES"
                   :key="status"
                   :disabled="isMutating || !isStatusActionEnabled(status)"
-                  class="inline-flex min-h-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed"
+                  class="inline-flex min-h-9 shrink-0 cursor-pointer items-center justify-center rounded-lg border px-3 py-1.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-300 dark:focus-visible:ring-surface-600"
                   :class="[
                     isCurrentStatus(status)
-                      ? 'border-brand-500 ring-2 ring-brand-500/30'
+                      ? 'border-brand-500'
                       : '',
                     isCurrentStatus(status) || isStatusActionEnabled(status)
                       ? statusBadgeClasses[status] ?? 'bg-surface-100 text-surface-600'
@@ -554,7 +554,7 @@ const isLoading = computed(() => {
               <div class="flex shrink-0 items-center gap-2">
                 <button
                   :disabled="currentIndex === 0"
-                  class="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-surface-200 px-2.5 py-1.5 text-xs text-surface-600 transition-colors hover:bg-surface-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-surface-700 dark:text-surface-400 dark:hover:bg-surface-800"
+                  class="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-surface-200 px-2.5 py-1.5 text-xs text-surface-600 transition-colors hover:bg-surface-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-surface-700 dark:text-surface-400 dark:hover:bg-surface-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-300 dark:focus-visible:ring-surface-600"
                   @click="goToPreviousCard"
                 >
                   <ArrowLeft class="size-4" />
@@ -562,7 +562,7 @@ const isLoading = computed(() => {
                 </button>
                 <button
                   :disabled="currentIndex >= focusedApplications.length - 1"
-                  class="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-surface-200 px-2.5 py-1.5 text-xs text-surface-600 transition-colors hover:bg-surface-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-surface-700 dark:text-surface-400 dark:hover:bg-surface-800"
+                  class="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-surface-200 px-2.5 py-1.5 text-xs text-surface-600 transition-colors hover:bg-surface-50 disabled:cursor-not-allowed disabled:opacity-50 dark:border-surface-700 dark:text-surface-400 dark:hover:bg-surface-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-surface-300 dark:focus-visible:ring-surface-600"
                   @click="goToNextCard"
                 >
                   Next
