@@ -35,10 +35,17 @@ const transitionLabels: Record<string, string> = {
 }
 
 const transitionClasses: Record<string, string> = {
-  draft: 'border border-surface-300 dark:border-surface-700 text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800',
-  open: 'bg-success-600 text-white hover:bg-success-700',
-  closed: 'bg-warning-600 text-white hover:bg-warning-700',
-  archived: 'border border-surface-300 dark:border-surface-700 text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800',
+  draft: 'border border-surface-300 dark:border-surface-700 bg-white/80 dark:bg-surface-900 text-surface-700 dark:text-surface-300 hover:border-surface-400 dark:hover:border-surface-600 hover:bg-surface-50 dark:hover:bg-surface-800',
+  open: 'bg-success-600 text-white shadow-sm shadow-success-900/20 hover:bg-success-700',
+  closed: 'bg-warning-600 text-white shadow-sm shadow-warning-900/20 hover:bg-warning-700',
+  archived: 'border border-surface-300 dark:border-surface-700 bg-white/80 dark:bg-surface-900 text-surface-700 dark:text-surface-300 hover:border-surface-400 dark:hover:border-surface-600 hover:bg-surface-50 dark:hover:bg-surface-800',
+}
+
+const transitionDotClasses: Record<string, string> = {
+  draft: 'bg-surface-400 dark:bg-surface-500',
+  open: 'bg-success-200',
+  closed: 'bg-warning-200',
+  archived: 'bg-surface-400 dark:bg-surface-500',
 }
 
 const allowedTransitions = computed(() => {
@@ -178,6 +185,69 @@ function handleCandidateApplied() {
   showApplyModal.value = false
   refresh()
 }
+
+// ─────────────────────────────────────────────
+// Applicants chart (last 14 days)
+// ─────────────────────────────────────────────
+
+const APPLICANTS_CHART_DAYS = 14
+
+function getLocalDateKey(date: Date): string {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
+const applicantsTrend = computed(() => {
+  const countsByDay: Record<string, number> = {}
+  const applications = job.value?.applications ?? []
+
+  for (const application of applications) {
+    const createdAt = new Date(application.createdAt)
+    if (Number.isNaN(createdAt.getTime())) continue
+    const key = getLocalDateKey(createdAt)
+    countsByDay[key] = (countsByDay[key] ?? 0) + 1
+  }
+
+  const end = new Date()
+  end.setHours(0, 0, 0, 0)
+
+  const points: Array<{
+    key: string
+    label: string
+    shortLabel: string
+    count: number
+    heightPercent: number
+  }> = []
+
+  for (let offset = APPLICANTS_CHART_DAYS - 1; offset >= 0; offset--) {
+    const date = new Date(end)
+    date.setDate(end.getDate() - offset)
+
+    const key = getLocalDateKey(date)
+    const count = countsByDay[key] ?? 0
+
+    points.push({
+      key,
+      label: date.toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+      shortLabel: date.toLocaleDateString(undefined, { day: 'numeric' }),
+      count,
+      heightPercent: 0,
+    })
+  }
+
+  const maxCount = Math.max(1, ...points.map(point => point.count))
+
+  return points.map(point => ({
+    ...point,
+    heightPercent: point.count === 0 ? 6 : Math.max((point.count / maxCount) * 100, 12),
+  }))
+})
+
+const applicantsInWindow = computed(() =>
+  applicantsTrend.value.reduce((total, point) => total + point.count, 0),
+)
 </script>
 
 <template>
@@ -223,14 +293,14 @@ function handleCandidateApplied() {
 
           <div class="flex items-center gap-2 shrink-0">
             <button
-              class="inline-flex items-center gap-1.5 rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-1.5 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+              class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-1.5 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
               @click="startEdit"
             >
               <Pencil class="size-3.5" />
               Edit
             </button>
             <button
-              class="inline-flex items-center gap-1.5 rounded-lg border border-danger-300 dark:border-danger-700 px-3 py-1.5 text-sm font-medium text-danger-600 dark:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-950 transition-colors"
+              class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-danger-300 dark:border-danger-700 px-3 py-1.5 text-sm font-medium text-danger-600 dark:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-950 transition-colors"
               @click="showDeleteConfirm = true"
             >
               <Trash2 class="size-3.5" />
@@ -240,18 +310,29 @@ function handleCandidateApplied() {
         </div>
 
         <!-- Status transition buttons -->
-        <div v-if="allowedTransitions.length > 0" class="flex items-center gap-2 mb-6">
-          <span class="text-xs font-medium text-surface-500 dark:text-surface-400 mr-1">Actions:</span>
-          <button
-            v-for="nextStatus in allowedTransitions"
-            :key="nextStatus"
-            :disabled="isTransitioning"
-            class="rounded-lg px-3 py-1.5 text-sm font-medium transition-colors disabled:opacity-50"
-            :class="transitionClasses[nextStatus] ?? 'border border-surface-300 dark:border-surface-700 text-surface-600 dark:text-surface-400 hover:bg-surface-50 dark:hover:bg-surface-800'"
-            @click="handleTransition(nextStatus)"
-          >
-            {{ transitionLabels[nextStatus] ?? nextStatus }}
-          </button>
+        <div
+          v-if="allowedTransitions.length > 0"
+          class="mb-6 rounded-xl border border-surface-200 dark:border-surface-800 bg-white/80 dark:bg-surface-900/70 p-3"
+        >
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="inline-flex items-center rounded-full bg-surface-100 dark:bg-surface-800 px-2.5 py-1 text-xs font-medium text-surface-600 dark:text-surface-400">
+              Quick actions
+            </span>
+            <button
+              v-for="nextStatus in allowedTransitions"
+              :key="nextStatus"
+              :disabled="isTransitioning"
+              class="inline-flex cursor-pointer items-center rounded-full px-3.5 py-1.5 text-sm font-medium transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-brand-500/40 disabled:cursor-not-allowed disabled:opacity-50"
+              :class="transitionClasses[nextStatus] ?? 'border border-surface-300 dark:border-surface-700 bg-white/80 dark:bg-surface-900 text-surface-700 dark:text-surface-300 hover:border-surface-400 dark:hover:border-surface-600 hover:bg-surface-50 dark:hover:bg-surface-800'"
+              @click="handleTransition(nextStatus)"
+            >
+              <span
+                class="mr-2 inline-flex size-1.5 rounded-full"
+                :class="transitionDotClasses[nextStatus] ?? 'bg-surface-400 dark:bg-surface-500'"
+              />
+              {{ transitionLabels[nextStatus] ?? nextStatus }}
+            </button>
+          </div>
         </div>
 
         <!-- Description -->
@@ -295,7 +376,7 @@ function handleCandidateApplied() {
           <div class="flex items-center justify-between mb-3">
             <h2 class="text-sm font-semibold text-surface-700 dark:text-surface-300">Applications</h2>
             <button
-              class="inline-flex items-center gap-1.5 rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-1.5 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+              class="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-1.5 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
               @click="showApplyModal = true"
             >
               <UserPlus class="size-3.5" />
@@ -308,6 +389,33 @@ function handleCandidateApplied() {
           <p class="text-xs text-surface-400 dark:text-surface-500 mt-1">
             Candidates in the hiring pipeline for this position.
           </p>
+
+          <div class="mt-4 rounded-lg border border-surface-200 dark:border-surface-800 bg-surface-50/80 dark:bg-surface-950/50 p-3">
+            <div class="mb-3 flex items-center justify-between">
+              <p class="text-xs font-medium text-surface-600 dark:text-surface-400">Applicants over time</p>
+              <p class="text-xs text-surface-500 dark:text-surface-500">Last {{ APPLICANTS_CHART_DAYS }} days · {{ applicantsInWindow }}</p>
+            </div>
+
+            <div class="flex h-24 items-end gap-1.5">
+              <div
+                v-for="point in applicantsTrend"
+                :key="point.key"
+                class="group flex h-full flex-1 items-end"
+                :title="`${point.label}: ${point.count} applicant${point.count === 1 ? '' : 's'}`"
+              >
+                <div
+                  class="w-full rounded-sm bg-brand-300/90 dark:bg-brand-700/70 transition-colors group-hover:bg-brand-500 dark:group-hover:bg-brand-500"
+                  :class="point.count === 0 ? 'opacity-35' : ''"
+                  :style="{ height: `${point.heightPercent}%` }"
+                />
+              </div>
+            </div>
+
+            <div class="mt-2 flex items-center justify-between text-[11px] text-surface-400 dark:text-surface-500">
+              <span>{{ applicantsTrend[0]?.label }}</span>
+              <span>{{ applicantsTrend[applicantsTrend.length - 1]?.label }}</span>
+            </div>
+          </div>
         </div>
 
         <!-- Apply Candidate Modal -->
@@ -387,13 +495,13 @@ function handleCandidateApplied() {
             <button
               type="submit"
               :disabled="isSaving"
-              class="inline-flex items-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              class="inline-flex cursor-pointer items-center rounded-lg bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               {{ isSaving ? 'Saving…' : 'Save Changes' }}
             </button>
             <button
               type="button"
-              class="rounded-lg border border-surface-300 dark:border-surface-700 px-4 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+              class="cursor-pointer rounded-lg border border-surface-300 dark:border-surface-700 px-4 py-2 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
               @click="cancelEdit"
             >
               Cancel
@@ -414,14 +522,14 @@ function handleCandidateApplied() {
             <div class="flex justify-end gap-2">
               <button
                 :disabled="isDeleting"
-                class="rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-1.5 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
+                class="cursor-pointer rounded-lg border border-surface-300 dark:border-surface-700 px-3 py-1.5 text-sm font-medium text-surface-700 dark:text-surface-300 hover:bg-surface-50 dark:hover:bg-surface-800 transition-colors"
                 @click="showDeleteConfirm = false"
               >
                 Cancel
               </button>
               <button
                 :disabled="isDeleting"
-                class="rounded-lg bg-danger-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-danger-700 disabled:opacity-50 transition-colors"
+                class="cursor-pointer rounded-lg bg-danger-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-danger-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 @click="handleDelete"
               >
                 {{ isDeleting ? 'Deleting…' : 'Delete' }}
