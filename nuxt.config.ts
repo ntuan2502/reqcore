@@ -48,6 +48,18 @@ export default defineNuxtConfig({
       demoOrgSlug: process.env.DEMO_ORG_SLUG || '',
       /** Whether in-app feedback via GitHub Issues is enabled */
       feedbackEnabled: !!(process.env.GITHUB_FEEDBACK_TOKEN && process.env.GITHUB_FEEDBACK_REPO),
+      /** Giscus comments widget configuration */
+      giscusRepo: process.env.NUXT_PUBLIC_GISCUS_REPO || '',
+      giscusRepoId: process.env.NUXT_PUBLIC_GISCUS_REPO_ID || '',
+      giscusCategory: process.env.NUXT_PUBLIC_GISCUS_CATEGORY || '',
+      giscusCategoryId: process.env.NUXT_PUBLIC_GISCUS_CATEGORY_ID || '',
+      giscusMapping: process.env.NUXT_PUBLIC_GISCUS_MAPPING || 'pathname',
+      giscusStrict: process.env.NUXT_PUBLIC_GISCUS_STRICT || '1',
+      giscusReactionsEnabled: process.env.NUXT_PUBLIC_GISCUS_REACTIONS_ENABLED || '1',
+      giscusEmitMetadata: process.env.NUXT_PUBLIC_GISCUS_EMIT_METADATA || '0',
+      giscusInputPosition: process.env.NUXT_PUBLIC_GISCUS_INPUT_POSITION || 'top',
+      giscusTheme: process.env.NUXT_PUBLIC_GISCUS_THEME || 'dark',
+      giscusLang: process.env.NUXT_PUBLIC_GISCUS_LANG || 'en',
     },
   },
 
@@ -98,6 +110,8 @@ export default defineNuxtConfig({
     '/roadmap': { prerender: true },
     '/blog': { prerender: true },
     '/blog/**': { prerender: true },
+    '/features': { prerender: true },
+    '/features/**': { prerender: true },
     '/jobs': { isr: 3600 },
     '/jobs/**': { isr: 3600 },
   },
