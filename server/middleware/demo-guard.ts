@@ -1,5 +1,6 @@
 import { eq } from 'drizzle-orm'
 import * as schema from '../database/schema'
+import { createPreviewReadOnlyError } from '../utils/previewReadOnly'
 
 /**
  * Demo guard middleware — blocks write operations (POST, PATCH, PUT, DELETE)
@@ -13,6 +14,12 @@ import * as schema from '../database/schema'
 // Cache the demo org ID to avoid a DB lookup on every request
 // ─────────────────────────────────────────────
 let demoOrgId: string | null | undefined // undefined = not yet resolved
+
+const PUBLIC_APPLY_PATH_REGEX = /^\/api\/public\/jobs\/([^/]+)\/apply\/?$/
+
+function throwDemoReadOnlyError(): never {
+  throw createPreviewReadOnlyError()
+}
 
 async function getDemoOrgId(): Promise<string | null> {
   if (demoOrgId !== undefined) return demoOrgId
@@ -50,6 +57,27 @@ export default defineEventHandler(async (event) => {
   // Only guard API routes
   if (!path.startsWith('/api/')) return
 
+  const guardedOrgId = await getDemoOrgId()
+  if (!guardedOrgId) return
+
+  // Public apply route has no session context, so resolve org by job slug.
+  const publicApplyMatch = path.match(PUBLIC_APPLY_PATH_REGEX)
+  if (publicApplyMatch) {
+    const slug = decodeURIComponent(publicApplyMatch[1] ?? '')
+    if (!slug) return
+
+    const [targetJob] = await db
+      .select({ organizationId: schema.job.organizationId })
+      .from(schema.job)
+      .where(eq(schema.job.slug, slug))
+      .limit(1)
+
+    if (targetJob?.organizationId === guardedOrgId) {
+      throwDemoReadOnlyError()
+    }
+    return
+  }
+
   // Check if the current session belongs to the demo org
   const session = await auth.api.getSession({ headers: event.headers })
   const activeOrganizationId = session
@@ -58,13 +86,7 @@ export default defineEventHandler(async (event) => {
 
   if (!activeOrganizationId) return
 
-  const guardedOrgId = await getDemoOrgId()
-  if (!guardedOrgId) return
-
   if (activeOrganizationId === guardedOrgId) {
-    throw createError({
-      statusCode: 403,
-      statusMessage: 'Demo mode — this action is disabled. Deploy your own instance to get full access.',
-    })
+    throwDemoReadOnlyError()
   }
 })
