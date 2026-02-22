@@ -5,6 +5,7 @@ import type { MaybeRefOrGetter } from 'vue'
  * Wraps the question CRUD endpoints for the recruiter dashboard.
  */
 export function useJobQuestions(jobId: MaybeRefOrGetter<string>) {
+  const { handlePreviewReadOnlyError } = usePreviewReadOnly()
   const id = computed(() => toValue(jobId))
 
   const { data: questions, status, error, refresh } = useFetch(
@@ -25,12 +26,17 @@ export function useJobQuestions(jobId: MaybeRefOrGetter<string>) {
     options?: string[]
     displayOrder?: number
   }) {
-    const created = await $fetch(`/api/jobs/${id.value}/questions`, {
-      method: 'POST',
-      body: payload,
-    })
-    await refresh()
-    return created
+    try {
+      const created = await $fetch(`/api/jobs/${id.value}/questions`, {
+        method: 'POST',
+        body: payload,
+      })
+      await refresh()
+      return created
+    } catch (error) {
+      handlePreviewReadOnlyError(error)
+      throw error
+    }
   }
 
   /** Update an existing question */
@@ -42,28 +48,43 @@ export function useJobQuestions(jobId: MaybeRefOrGetter<string>) {
     options?: string[] | null
     displayOrder?: number
   }) {
-    const updated = await $fetch(`/api/jobs/${id.value}/questions/${questionId}`, {
-      method: 'PATCH',
-      body: payload,
-    })
-    await refresh()
-    return updated
+    try {
+      const updated = await $fetch(`/api/jobs/${id.value}/questions/${questionId}`, {
+        method: 'PATCH',
+        body: payload,
+      })
+      await refresh()
+      return updated
+    } catch (error) {
+      handlePreviewReadOnlyError(error)
+      throw error
+    }
   }
 
   /** Delete a question by ID */
   async function deleteQuestion(questionId: string) {
-    await $fetch(`/api/jobs/${id.value}/questions/${questionId}`, {
-      method: 'DELETE',
-    })
+    try {
+      await $fetch(`/api/jobs/${id.value}/questions/${questionId}`, {
+        method: 'DELETE',
+      })
+    } catch (error) {
+      handlePreviewReadOnlyError(error)
+      throw error
+    }
     await refresh()
   }
 
   /** Bulk reorder questions */
   async function reorderQuestions(order: { id: string; displayOrder: number }[]) {
-    await $fetch(`/api/jobs/${id.value}/questions/reorder`, {
-      method: 'PUT',
-      body: { order },
-    })
+    try {
+      await $fetch(`/api/jobs/${id.value}/questions/reorder`, {
+        method: 'PUT',
+        body: { order },
+      })
+    } catch (error) {
+      handlePreviewReadOnlyError(error)
+      throw error
+    }
     await refresh()
   }
 

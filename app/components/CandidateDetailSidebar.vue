@@ -4,6 +4,7 @@ import {
   ExternalLink, Mail, Phone, Upload, Download, Eye, Trash2,
   ArrowLeft, AlertTriangle,
 } from 'lucide-vue-next'
+import { usePreviewReadOnly } from '~/composables/usePreviewReadOnly'
 
 const props = defineProps<{
   applicationId: string
@@ -14,6 +15,8 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'updated'): void
 }>()
+
+const { handlePreviewReadOnlyError } = usePreviewReadOnly()
 
 // ─────────────────────────────────────────────
 // Tabs
@@ -114,6 +117,7 @@ async function handleTransition(newStatus: string) {
     await refresh()
     emit('updated')
   } catch (err: any) {
+    if (handlePreviewReadOnlyError(err)) return
     alert(err.data?.statusMessage ?? 'Failed to update status')
   } finally {
     isTransitioning.value = false
@@ -144,6 +148,7 @@ async function saveNotes() {
     emit('updated')
     isEditingNotes.value = false
   } catch (err: any) {
+    if (handlePreviewReadOnlyError(err)) return
     alert(err.data?.statusMessage ?? 'Failed to save notes')
   } finally {
     isSavingNotes.value = false
@@ -247,6 +252,7 @@ async function handleDeleteDoc(docId: string) {
     await refreshCandidate()
     showDocDeleteConfirm.value = null
   } catch (err: any) {
+    if (handlePreviewReadOnlyError(err)) return
     alert(err.data?.statusMessage ?? 'Failed to delete document')
   } finally {
     isDeletingDoc.value = false

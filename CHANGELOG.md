@@ -6,16 +6,36 @@ Format follows [Keep a Changelog](https://keepachangelog.com). Categories: **Add
 
 ---
 
+## 2026-02-22
+
+### Fixed
+
+- **Railway PR seed execution** — removed hard `.env` dependency from `db:seed`; seeding now works with platform-injected env vars and still supports local `.env` loading in `seed.ts`
+
+### Changed
+
+- **Unified Railway seeding path** — Railway predeploy now runs `db:seed` (same script as standard demo data), removing PR-specific seed divergence between preview and production-like environments
+- **Preview demo defaults aligned** — runtime preview fallbacks now target `applirank-demo` and `demo@applirank.com` to match `server/scripts/seed.ts`
+
+### Removed
+
+- **PR-only seed script** — removed `server/scripts/seed-pr.ts` and the `db:seed:pr` npm script
+
+---
+
 ## 2026-02-21
 
 ### Fixed
 
 - **Dependency security remediation** — resolved all `npm audit --audit-level=high` findings by upgrading `@aws-sdk/client-s3` (pulling patched `@aws-sdk/xml-builder`) and regenerating lockfile resolution
 - **Transitive vulnerability pinning** — added npm `overrides` for `fast-xml-parser`, `minimatch`, `tar`, and `readdir-glob` to keep vulnerable transitive ranges out of the install graph
+- **Demo write-protection enforcement** — hardened server demo guard so `POST`/`PATCH`/`PUT`/`DELETE` requests are consistently blocked for the configured demo organization and no longer silently fail open when demo org lookup fails
+- **Dashboard preview UX** — write attempts in preview mode now trigger a dedicated upsell modal instead of only inline/API errors, while keeping action buttons visible
 
 ### Changed
 
 - **Lockfile hygiene** — refreshed dependency graph with `npm install` + `npm dedupe` to remove stale vulnerable transitive entries
+- **Demo env guidance** — `.env.example` demo slug example now matches seeded demo organization slug (`applirank-demo`) to reduce configuration drift
 
 ---
 

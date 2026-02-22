@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ArrowLeft, Pencil, Trash2, Mail, Phone, Calendar, Clock, Briefcase, FileText, Plus, Upload, Download, Eye, X, AlertTriangle } from 'lucide-vue-next'
 import { z } from 'zod'
+import { usePreviewReadOnly } from '~/composables/usePreviewReadOnly'
 
 definePageMeta({
   layout: 'dashboard',
@@ -9,6 +10,7 @@ definePageMeta({
 
 const route = useRoute()
 const candidateId = route.params.id as string
+const { handlePreviewReadOnlyError } = usePreviewReadOnly()
 
 const { candidate, status: fetchStatus, error, refresh, updateCandidate, deleteCandidate } = useCandidate(candidateId)
 
@@ -86,6 +88,7 @@ async function handleSave() {
     })
     isEditing.value = false
   } catch (err: any) {
+    if (handlePreviewReadOnlyError(err)) return
     const message = err.data?.statusMessage ?? 'Failed to save changes'
     if (err.statusCode === 409 || err.data?.statusCode === 409) {
       editErrors.value.email = message
@@ -109,6 +112,7 @@ async function handleDelete() {
   try {
     await deleteCandidate()
   } catch (err: any) {
+    if (handlePreviewReadOnlyError(err)) return
     alert(err.data?.statusMessage ?? 'Failed to delete candidate')
     isDeleting.value = false
     showDeleteConfirm.value = false
@@ -237,6 +241,7 @@ async function handleDeleteDoc(docId: string) {
     await deleteDocument(docId, candidateId)
     showDocDeleteConfirm.value = null
   } catch (err: any) {
+    if (handlePreviewReadOnlyError(err)) return
     alert(err.data?.statusMessage ?? 'Failed to delete document')
   } finally {
     isDeletingDoc.value = false

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { ArrowLeft, User, Briefcase, Calendar, Clock, Hash, FileText, MessageSquare } from 'lucide-vue-next'
+import { usePreviewReadOnly } from '~/composables/usePreviewReadOnly'
 
 definePageMeta({
   layout: 'dashboard',
@@ -8,6 +9,7 @@ definePageMeta({
 
 const route = useRoute()
 const applicationId = route.params.id as string
+const { handlePreviewReadOnlyError } = usePreviewReadOnly()
 
 const { application, status: fetchStatus, error, updateApplication } = useApplication(applicationId)
 
@@ -71,6 +73,7 @@ async function handleTransition(newStatus: string) {
   try {
     await updateApplication({ status: newStatus as any })
   } catch (err: any) {
+    if (handlePreviewReadOnlyError(err)) return
     alert(err.data?.statusMessage ?? 'Failed to update status')
   } finally {
     isTransitioning.value = false
@@ -96,6 +99,7 @@ async function saveNotes() {
     await updateApplication({ notes: notesInput.value || null })
     isEditingNotes.value = false
   } catch (err: any) {
+    if (handlePreviewReadOnlyError(err)) return
     alert(err.data?.statusMessage ?? 'Failed to save notes')
   } finally {
     isSavingNotes.value = false

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Search, X, UserPlus } from 'lucide-vue-next'
+import { usePreviewReadOnly } from '~/composables/usePreviewReadOnly'
 
 const props = defineProps<{
   jobId: string
@@ -32,6 +33,7 @@ const { data: candidateData, status: searchStatus } = useFetch('/api/candidates'
 })
 
 const candidates = computed(() => candidateData.value?.data ?? [])
+const { handlePreviewReadOnlyError } = usePreviewReadOnly()
 
 // Apply candidate
 const isApplying = ref(false)
@@ -47,6 +49,7 @@ async function applyCandidate(candidateId: string) {
     })
     emit('created')
   } catch (err: any) {
+    if (handlePreviewReadOnlyError(err)) return
     applyError.value = err.data?.statusMessage ?? 'Failed to apply candidate'
   } finally {
     isApplying.value = false

@@ -26,6 +26,19 @@ import * as schema from '../database/schema'
 // Config
 // ─────────────────────────────────────────────
 
+const processWithLoadEnv = process as NodeJS.Process & {
+  loadEnvFile?: (path?: string) => void
+}
+
+if (!process.env.DATABASE_URL && typeof processWithLoadEnv.loadEnvFile === 'function') {
+  try {
+    processWithLoadEnv.loadEnvFile('.env')
+  }
+  catch {
+    // .env is optional in hosted environments like Railway
+  }
+}
+
 const DATABASE_URL = process.env.DATABASE_URL
 if (!DATABASE_URL) {
   console.error('DATABASE_URL is required. Set it in .env or export it.')
@@ -86,35 +99,35 @@ function generateSlug(title: string, uuid: string): string {
 const JOBS_DATA = [
   {
     title: 'Senior Full-Stack Engineer',
-    description: `We're looking for a Senior Full-Stack Engineer to lead the development of our core platform. You'll work with a modern tech stack (TypeScript, Vue 3, Nuxt, PostgreSQL) and have significant impact on product direction.\n\n**Responsibilities**\n- Design and implement new features end-to-end\n- Mentor junior engineers through code reviews and pairing sessions\n- Contribute to architecture decisions and technical planning\n- Ensure code quality through testing and CI/CD practices\n\n**Requirements**\n- 5+ years of professional software engineering experience\n- Strong proficiency in TypeScript and a modern frontend framework (Vue, React, or Svelte)\n- Experience with PostgreSQL and ORM tools (Drizzle, Prisma, or similar)\n- Familiarity with Docker, CI/CD pipelines, and cloud deployment\n- Excellent problem-solving and communication skills`,
+    description: `We're hiring a Senior Full-Stack Engineer to help scale the core Applirank platform used by growing hiring teams. You will own high-impact features across product, API, and data layers using TypeScript, Nuxt, and PostgreSQL in a pragmatic, fast-moving environment.\n\n**What you'll do**\n- Deliver end-to-end features from discovery and technical design to production rollout\n- Shape architecture decisions for multi-tenant workflows, performance, and reliability\n- Partner with product and design to turn recruiter pain points into elegant UX\n- Raise engineering quality through thoughtful code review, testing, and observability\n- Mentor team members and improve development standards across the stack\n\n**What we're looking for**\n- 5+ years building and shipping production web applications\n- Strong TypeScript proficiency across frontend and backend services\n- Experience with modern component architectures (Vue, React, or similar)\n- Practical PostgreSQL skills including query tuning and schema evolution\n- Familiarity with CI/CD, Dockerized environments, and cloud deployment workflows\n- Clear communication and ownership mindset in cross-functional teams\n\n**Nice to have**\n- Experience building internal tools, ATS/HR products, or workflow-heavy B2B software\n- Interest in transparent, explainable AI experiences`,
     location: 'Berlin, Germany (Hybrid)',
     type: 'full_time' as const,
     status: 'open' as const,
   },
   {
     title: 'Product Designer',
-    description: `Join our design team to shape the user experience of Applirank. You'll work closely with engineering and product to create intuitive, beautiful interfaces for recruiters and candidates.\n\n**Responsibilities**\n- Own the design process from research to high-fidelity prototypes\n- Conduct user interviews and usability testing\n- Create and maintain our design system\n- Collaborate daily with developers on implementation details\n\n**Requirements**\n- 3+ years of product design experience (B2B SaaS preferred)\n- Expert-level Figma skills\n- Portfolio showing end-to-end design work\n- Experience with design systems and component libraries\n- Strong understanding of accessibility standards`,
+    description: `Join Applirank as a Product Designer and craft the daily workflows used by recruiters to evaluate talent fairly and efficiently. You'll collaborate closely with engineering and product to design intuitive, high-trust experiences across dashboard, pipeline, and candidate flows.\n\n**What you'll do**\n- Lead design work from discovery through polished UI and production handoff\n- Translate complex hiring workflows into clear, low-friction user journeys\n- Run lightweight research and usability testing with real recruiting users\n- Evolve our design system and interaction patterns for speed and consistency\n- Partner with engineers to ensure high-quality implementation and accessibility\n\n**What we're looking for**\n- 3+ years in product design, ideally in B2B SaaS or workflow tools\n- Strong portfolio demonstrating end-to-end problem-solving and measurable outcomes\n- Advanced Figma skills including components, variants, and prototyping\n- Experience balancing visual polish with delivery constraints\n- Solid understanding of accessibility, hierarchy, and information architecture\n\n**Nice to have**\n- Experience designing data-rich interfaces or collaborative tooling\n- Familiarity with recruiting, HR, or marketplace products`,
     location: 'Remote (EU)',
     type: 'full_time' as const,
     status: 'open' as const,
   },
   {
     title: 'DevOps Engineer',
-    description: `We need a DevOps Engineer to build and maintain our infrastructure. You'll be responsible for CI/CD, monitoring, and ensuring our self-hosted product is easy to deploy.\n\n**Responsibilities**\n- Build and maintain CI/CD pipelines (GitHub Actions)\n- Manage Docker-based deployments and infrastructure\n- Set up monitoring, alerting, and logging (Grafana, Prometheus)\n- Write deployment documentation and automation scripts\n- Ensure security best practices across infrastructure\n\n**Requirements**\n- 3+ years of DevOps/Infrastructure experience\n- Strong Docker and Docker Compose expertise\n- Experience with Linux server administration\n- Familiarity with Caddy, Nginx, or similar reverse proxies\n- Knowledge of PostgreSQL operations (backup, restore, monitoring)`,
+    description: `We are looking for a DevOps Engineer to harden and streamline our delivery platform across hosted and self-hosted environments. You will own deployment reliability, operational visibility, and developer productivity with a strong focus on secure, repeatable infrastructure.\n\n**What you'll do**\n- Build and improve CI/CD pipelines for faster, safer releases\n- Maintain containerized environments and infrastructure automation\n- Improve runtime observability with meaningful alerts, dashboards, and runbooks\n- Strengthen backup, restore, and disaster recovery practices for Postgres and storage\n- Document deployment standards to make enterprise self-hosting predictable\n\n**What we're looking for**\n- 3+ years of DevOps or platform engineering experience\n- Deep Docker and Linux operations knowledge\n- Hands-on CI/CD experience (GitHub Actions, GitLab CI, or similar)\n- Practical understanding of reverse proxies, TLS, and networking fundamentals\n- Experience with database operations and incident response\n\n**Nice to have**\n- IaC experience (Terraform, Pulumi, or equivalent)\n- Experience supporting compliance-sensitive B2B workloads`,
     location: 'Remote (Worldwide)',
     type: 'contract' as const,
     status: 'open' as const,
   },
   {
     title: 'Technical Writer (Part-Time)',
-    description: `Help us create world-class documentation for Applirank. From setup guides to API references, your writing will help thousands of developers and recruiters use our product.\n\n**Responsibilities**\n- Write and maintain deployment guides, API docs, and tutorials\n- Create onboarding documentation for new users\n- Review and improve existing documentation\n- Collaborate with engineering on changelog and release notes\n\n**Requirements**\n- 2+ years of technical writing experience\n- Ability to explain complex technical concepts to non-technical audiences\n- Experience with Markdown and docs-as-code workflows\n- Familiarity with open-source project documentation patterns`,
+    description: `We're hiring a part-time Technical Writer to make Applirank documentation clear, actionable, and enterprise-ready. Your work will directly improve product adoption by helping recruiters, admins, and developers succeed quickly.\n\n**What you'll do**\n- Create and maintain setup guides, API docs, and troubleshooting playbooks\n- Improve onboarding flows for first-time teams and self-hosted deployments\n- Standardize tone, structure, and quality across product documentation\n- Work with engineering and product to document new releases and migrations\n- Identify knowledge gaps from support and feedback loops\n\n**What we're looking for**\n- 2+ years writing technical documentation for software products\n- Ability to explain complex systems in simple, practical language\n- Strong Markdown/docs-as-code workflow habits\n- Attention to clarity, consistency, and user intent\n- Experience editing developer-facing and operations-focused content\n\n**Nice to have**\n- Open-source documentation contributions\n- Familiarity with hiring/recruiting software terminology`,
     location: 'Remote (EU)',
     type: 'part_time' as const,
     status: 'open' as const,
   },
   {
     title: 'Frontend Engineering Intern',
-    description: `A 6-month internship opportunity for aspiring frontend developers. You'll work on real features in a production codebase, getting hands-on experience with Vue 3, Nuxt 4, and Tailwind CSS.\n\n**What You'll Learn**\n- Build production Vue 3 components with Composition API\n- Work with TypeScript in a real-world codebase\n- Understand SSR concepts with Nuxt\n- Practice Git workflows, code review, and agile development\n\n**Requirements**\n- Currently enrolled in CS/SE degree or bootcamp\n- Basic knowledge of HTML, CSS, and JavaScript\n- Familiarity with Vue or React is a plus\n- Enthusiasm for learning and growth mindset`,
+    description: `Start your frontend career on a real product with real users. In this 6-month internship, you'll contribute production code to Applirank while learning modern frontend engineering practices from an experienced team.\n\n**What you'll work on**\n- Build and ship Vue/Nuxt interface components used in daily recruiting workflows\n- Improve usability, accessibility, and performance of existing screens\n- Collaborate in code reviews and iterative delivery cycles\n- Learn how product, design, and engineering collaborate in a modern SaaS team\n\n**What we're looking for**\n- Currently enrolled in computer science, software engineering, or equivalent program\n- Strong foundations in HTML, CSS, and JavaScript\n- Basic familiarity with TypeScript and component-based frameworks is a plus\n- Curiosity, coachability, and attention to detail\n- Ability to communicate clearly and ask good questions\n\n**Internship details**\n- Structured mentorship, weekly feedback, and clear growth goals\n- Opportunity to present shipped work at the end of the internship`,
     location: 'Berlin, Germany (On-site)',
     type: 'internship' as const,
     status: 'draft' as const,
@@ -192,61 +205,84 @@ interface ApplicationAssignment {
   notes?: string
 }
 
-// Job 0: Senior Full-Stack Engineer — most applications, full pipeline
+// Job 0: Senior Full-Stack Engineer — high volume, full funnel
 const JOB_0_APPS: ApplicationAssignment[] = [
-  { candidateIndex: 0, status: 'hired', score: 95, notes: 'Excellent TypeScript skills. Strong culture fit. Accepted offer.' },
-  { candidateIndex: 1, status: 'offer', score: 90, notes: 'Great system design skills. Preparing offer letter.' },
-  { candidateIndex: 2, status: 'interview', score: 85, notes: 'Strong portfolio. Scheduled final round for next week.' },
-  { candidateIndex: 3, status: 'interview', score: 82, notes: 'Passed take-home. Technical interview pending.' },
-  { candidateIndex: 4, status: 'interview', score: 78, notes: 'Good communication. Moving to system design round.' },
-  { candidateIndex: 5, status: 'screening', score: 75, notes: 'Interesting background in distributed systems.' },
-  { candidateIndex: 6, status: 'screening', score: 72, notes: 'Resume looks strong. Scheduling intro call.' },
-  { candidateIndex: 7, status: 'screening', score: 70 },
-  { candidateIndex: 8, status: 'new', score: 68 },
-  { candidateIndex: 9, status: 'new', score: 65 },
-  { candidateIndex: 10, status: 'new' },
-  { candidateIndex: 11, status: 'new' },
-  { candidateIndex: 12, status: 'new' },
-  { candidateIndex: 13, status: 'rejected', score: 40, notes: 'Insufficient TypeScript experience for senior role.' },
-  { candidateIndex: 14, status: 'rejected', score: 35, notes: 'No backend experience. Better fit for frontend role.' },
-  { candidateIndex: 15, status: 'rejected', score: 30, notes: 'Location requirements don\'t match.' },
+  { candidateIndex: 0, status: 'hired', score: 96, notes: 'Outstanding architecture interview and strong leadership examples. Accepted offer.' },
+  { candidateIndex: 1, status: 'offer', score: 92, notes: 'Excellent systems design and pragmatic decision-making. Offer package in final approval.' },
+  { candidateIndex: 2, status: 'offer', score: 89, notes: 'Strong backend depth and clear communication. Final compensation discussion scheduled.' },
+  { candidateIndex: 3, status: 'interview', score: 86, notes: 'Great take-home submission. Final panel interview planned next week.' },
+  { candidateIndex: 4, status: 'interview', score: 84, notes: 'Consistent coding quality. Proceeding to architecture round.' },
+  { candidateIndex: 5, status: 'interview', score: 81, notes: 'Positive recruiter and hiring manager feedback. Interview loop in progress.' },
+  { candidateIndex: 6, status: 'screening', score: 78, notes: 'Relevant multi-tenant SaaS experience. Scheduling technical screen.' },
+  { candidateIndex: 7, status: 'screening', score: 75, notes: 'Solid TypeScript background. Waiting on availability for first call.' },
+  { candidateIndex: 8, status: 'new', score: 73, notes: 'Promising CV with production Nuxt experience. Pending initial review.' },
+  { candidateIndex: 9, status: 'new', score: 70, notes: 'Good open-source profile. Recruiter triage queued.' },
+  { candidateIndex: 10, status: 'new', score: 68 },
+  { candidateIndex: 11, status: 'new', score: 66 },
+  { candidateIndex: 12, status: 'rejected', score: 44, notes: 'Experience level below senior expectations for this role.' },
+  { candidateIndex: 13, status: 'rejected', score: 39, notes: 'Limited backend ownership in recent roles.' },
 ]
 
-// Job 1: Product Designer — moderate applications
+// Job 1: Product Designer — strong mid-funnel representation
 const JOB_1_APPS: ApplicationAssignment[] = [
-  { candidateIndex: 16, status: 'interview', score: 92, notes: 'Outstanding portfolio. Design system experience.' },
-  { candidateIndex: 17, status: 'interview', score: 88, notes: 'Great case studies. Scheduling portfolio review.' },
-  { candidateIndex: 18, status: 'screening', score: 80, notes: 'Interesting transition from engineering to design.' },
-  { candidateIndex: 19, status: 'screening', score: 77 },
-  { candidateIndex: 20, status: 'new', score: 74 },
-  { candidateIndex: 21, status: 'new' },
-  { candidateIndex: 22, status: 'new' },
-  { candidateIndex: 23, status: 'rejected', score: 45, notes: 'Portfolio mostly marketing design, not product.' },
-  { candidateIndex: 24, status: 'rejected', score: 38, notes: 'No B2B SaaS experience.' },
+  { candidateIndex: 14, status: 'offer', score: 91, notes: 'Exceptional portfolio depth and design-system leadership. Preparing offer.' },
+  { candidateIndex: 15, status: 'interview', score: 88, notes: 'Strong product thinking and workshop facilitation skills.' },
+  { candidateIndex: 16, status: 'interview', score: 86, notes: 'High-quality case studies with clear impact metrics.' },
+  { candidateIndex: 17, status: 'interview', score: 83, notes: 'Great cross-functional collaboration examples.' },
+  { candidateIndex: 18, status: 'screening', score: 79, notes: 'Compelling research approach. Moving to portfolio walkthrough.' },
+  { candidateIndex: 19, status: 'screening', score: 76, notes: 'Strong visual craft. Reviewing B2B experience depth.' },
+  { candidateIndex: 20, status: 'new', score: 74, notes: 'Interesting transition from frontend engineering into product design.' },
+  { candidateIndex: 21, status: 'new', score: 71 },
+  { candidateIndex: 22, status: 'new', score: 69 },
+  { candidateIndex: 23, status: 'new', score: 67 },
+  { candidateIndex: 24, status: 'rejected', score: 46, notes: 'Portfolio focus is primarily brand and campaign design.' },
+  { candidateIndex: 25, status: 'rejected', score: 41, notes: 'Limited product discovery and usability testing examples.' },
 ]
 
-// Job 2: DevOps Engineer — fewer applications (contract role)
+// Job 2: DevOps Engineer — healthy pipeline for a contract position
 const JOB_2_APPS: ApplicationAssignment[] = [
-  { candidateIndex: 8, status: 'offer', score: 91, notes: 'Perfect fit. Strong Docker + Kubernetes expertise.' },
-  { candidateIndex: 13, status: 'interview', score: 84, notes: 'Good infrastructure background. Clarifying contract terms.' },
-  { candidateIndex: 25, status: 'screening', score: 76, notes: 'AWS certified. Reviewing Hetzner experience.' },
-  { candidateIndex: 26, status: 'new', score: 70 },
-  { candidateIndex: 27, status: 'new' },
-  { candidateIndex: 28, status: 'rejected', score: 42, notes: 'Only Windows server experience.' },
+  { candidateIndex: 5, status: 'hired', score: 94, notes: 'Strong container orchestration and observability setup. Contract signed.' },
+  { candidateIndex: 6, status: 'offer', score: 90, notes: 'Excellent platform reliability background. Offer sent.' },
+  { candidateIndex: 7, status: 'interview', score: 85, notes: 'Deep CI/CD experience. Final technical interview scheduled.' },
+  { candidateIndex: 8, status: 'interview', score: 83, notes: 'Strong automation mindset and incident response examples.' },
+  { candidateIndex: 9, status: 'screening', score: 79, notes: 'Good cloud fundamentals. Validating production ownership scope.' },
+  { candidateIndex: 10, status: 'screening', score: 76, notes: 'Relevant Docker and IaC stack. Recruiter follow-up pending.' },
+  { candidateIndex: 26, status: 'new', score: 72, notes: 'Promising profile. Awaiting first availability window.' },
+  { candidateIndex: 27, status: 'new', score: 70 },
+  { candidateIndex: 28, status: 'new', score: 67 },
+  { candidateIndex: 29, status: 'rejected', score: 45, notes: 'Skillset weighted toward support operations, limited platform engineering depth.' },
+  { candidateIndex: 13, status: 'rejected', score: 40, notes: 'Primary experience with legacy on-prem tooling; limited cloud-native track record.' },
 ]
 
-// Job 3: Technical Writer — some applications
+// Job 3: Technical Writer — consistent pipeline quality
 const JOB_3_APPS: ApplicationAssignment[] = [
-  { candidateIndex: 29, status: 'screening', score: 85, notes: 'Published tech blog with excellent writing samples.' },
-  { candidateIndex: 14, status: 'screening', score: 79 },
-  { candidateIndex: 20, status: 'new', score: 71 },
-  { candidateIndex: 21, status: 'new' },
-  { candidateIndex: 22, status: 'rejected', score: 50, notes: 'Writing samples were mostly marketing copy, not technical.' },
+  { candidateIndex: 12, status: 'offer', score: 90, notes: 'Clear, structured writing samples and strong docs-as-code workflow.' },
+  { candidateIndex: 14, status: 'interview', score: 86, notes: 'Great API documentation examples and editorial discipline.' },
+  { candidateIndex: 16, status: 'interview', score: 83, notes: 'Strong technical depth and clean information architecture approach.' },
+  { candidateIndex: 18, status: 'screening', score: 78, notes: 'Good writing quality; validating long-form technical ownership.' },
+  { candidateIndex: 20, status: 'screening', score: 75, notes: 'Strong communication style. Intro call booked.' },
+  { candidateIndex: 22, status: 'new', score: 72 },
+  { candidateIndex: 24, status: 'new', score: 69 },
+  { candidateIndex: 26, status: 'new', score: 66 },
+  { candidateIndex: 28, status: 'rejected', score: 49, notes: 'Writing portfolio is mostly social and campaign content.' },
+  { candidateIndex: 29, status: 'rejected', score: 43, notes: 'Limited experience with developer-focused documentation.' },
 ]
 
-// Job 4: Frontend Intern — draft, no applications yet
+// Job 4: Frontend Engineering Intern — active early-career funnel
+const JOB_4_APPS: ApplicationAssignment[] = [
+  { candidateIndex: 0, status: 'interview', score: 88, notes: 'Impressive internship project quality and thoughtful code reviews in GitHub profile.' },
+  { candidateIndex: 2, status: 'interview', score: 84, notes: 'Strong fundamentals in Vue and Tailwind. Team fit interview scheduled.' },
+  { candidateIndex: 4, status: 'screening', score: 79, notes: 'Good learning velocity and clean component architecture examples.' },
+  { candidateIndex: 6, status: 'screening', score: 76, notes: 'Strong front-end fundamentals; evaluating SSR understanding.' },
+  { candidateIndex: 11, status: 'screening', score: 74, notes: 'Promising portfolio with clear UX thinking for early-career level.' },
+  { candidateIndex: 15, status: 'new', score: 71 },
+  { candidateIndex: 17, status: 'new', score: 69 },
+  { candidateIndex: 19, status: 'new', score: 67 },
+  { candidateIndex: 21, status: 'new', score: 65 },
+  { candidateIndex: 23, status: 'rejected', score: 46, notes: 'Limited JavaScript fundamentals demonstrated in practical assessment.' },
+]
 
-const JOB_APPLICATIONS = [JOB_0_APPS, JOB_1_APPS, JOB_2_APPS, JOB_3_APPS, []]
+const JOB_APPLICATIONS = [JOB_0_APPS, JOB_1_APPS, JOB_2_APPS, JOB_3_APPS, JOB_4_APPS]
 
 // Sample responses for questions
 function generateResponses(jobIndex: number, candidateIndex: number): Record<string, string | string[] | boolean> {
