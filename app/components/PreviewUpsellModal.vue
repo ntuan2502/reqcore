@@ -6,6 +6,7 @@ const emit = defineEmits<{
 }>()
 
 const { message } = usePreviewReadOnly()
+const config = useRuntimeConfig()
 
 function closeModal() {
   emit('close')
@@ -43,7 +44,9 @@ function closeModal() {
 
           <div class="flex flex-wrap items-center gap-2">
             <a
-              href="mailto:sales@applirank.com?subject=Applirank%20Hosted%20Plan"
+              :href="config.public.hostedPlanUrl"
+              target="_blank"
+              rel="noopener noreferrer"
               class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700"
             >
               <Rocket class="size-4" />
