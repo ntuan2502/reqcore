@@ -8,6 +8,11 @@ Format follows [Keep a Changelog](https://keepachangelog.com). Categories: **Add
 
 ## 2026-02-22
 
+### Added
+
+- **Blog: Best Open Source Applicant Tracking Systems [2026]** — Cluster 2 pillar page. 3,800-word comparison of 7 open source ATS platforms with TCO analysis, evaluation framework, and FAQ. Published to `content/blog/best-open-source-applicant-tracking-systems.md`
+- **Internal link** — added cross-link from `self-hosted-vs-cloud-ats.md` to new pillar page
+
 ### Fixed
 
 - **Railway PR seed execution** — removed hard `.env` dependency from `db:seed`; seeding now works with platform-injected env vars and still supports local `.env` loading in `seed.ts`

@@ -39,7 +39,7 @@ A cloud ATS is hosted and managed by the vendor. You sign up, pay a subscription
 
 A self-hosted ATS runs on infrastructure you control — your own server, VPS, or private cloud. You install the software, connect your own database, and retain full control over the data and configuration.
 
-**Examples:** [Applirank](/) (open-source), OpenCATS.
+**Examples:** [Applirank](/) (open-source), OpenCATS. For a comprehensive comparison of all available options, see our guide to the [best open source applicant tracking systems](/blog/best-open-source-applicant-tracking-systems).
 
 ### Pros of Self-Hosted ATS
 
