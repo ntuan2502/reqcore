@@ -47,7 +47,7 @@ function closeModal() {
               class="inline-flex items-center gap-2 rounded-lg bg-brand-600 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-700"
             >
               <Rocket class="size-4" />
-              Contact sales
+              Upgrade to hosted plan
             </a>
 
             <a
@@ -56,7 +56,7 @@ function closeModal() {
               rel="noopener noreferrer"
               class="inline-flex items-center rounded-lg border border-surface-300 px-3 py-2 text-sm font-medium text-surface-700 transition-colors hover:bg-surface-50 dark:border-surface-700 dark:text-surface-200 dark:hover:bg-surface-800"
             >
-              Deploy your own
+              Self-host on GitHub
             </a>
           </div>
         </div>

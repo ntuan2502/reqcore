@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Pencil, Trash2, MapPin, Clock, Calendar, UserPlus } from 'lucide-vue-next'
 import { z } from 'zod'
+import { usePreviewReadOnly } from '~/composables/usePreviewReadOnly'
 
 definePageMeta({
   layout: 'dashboard',
@@ -9,6 +10,7 @@ definePageMeta({
 
 const route = useRoute()
 const jobId = route.params.id as string
+const { handlePreviewReadOnlyError } = usePreviewReadOnly()
 
 const { job, status: fetchStatus, error, refresh, updateJob, deleteJob } = useJob(jobId)
 
@@ -60,6 +62,7 @@ async function handleTransition(newStatus: string) {
   try {
     await updateJob({ status: newStatus as any })
   } catch (err: any) {
+    if (handlePreviewReadOnlyError(err)) return
     alert(err.data?.statusMessage ?? 'Failed to update status')
   } finally {
     isTransitioning.value = false
@@ -126,6 +129,7 @@ async function handleSave() {
     })
     isEditing.value = false
   } catch (err: any) {
+    if (handlePreviewReadOnlyError(err)) return
     alert(err.data?.statusMessage ?? 'Failed to save changes')
   } finally {
     isSaving.value = false
@@ -144,6 +148,7 @@ async function handleDelete() {
   try {
     await deleteJob()
   } catch (err: any) {
+    if (handlePreviewReadOnlyError(err)) return
     alert(err.data?.statusMessage ?? 'Failed to delete job')
     isDeleting.value = false
     showDeleteConfirm.value = false
