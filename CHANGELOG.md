@@ -6,6 +6,19 @@ Format follows [Keep a Changelog](https://keepachangelog.com). Categories: **Add
 
 ---
 
+## 2026-02-22
+
+### Changed
+
+- **Unified Railway seeding path** — Railway predeploy now runs `db:seed` (same script as standard demo data), removing PR-specific seed divergence between preview and production-like environments
+- **Preview demo defaults aligned** — runtime preview fallbacks now target `applirank-demo` and `demo@applirank.com` to match `server/scripts/seed.ts`
+
+### Removed
+
+- **PR-only seed script** — removed `server/scripts/seed-pr.ts` and the `db:seed:pr` npm script
+
+---
+
 ## 2026-02-21
 
 ### Fixed

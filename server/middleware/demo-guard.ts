@@ -17,7 +17,7 @@ import { isRailwayPreviewEnvironment } from '../utils/env'
 // the org is created after server startup.
 // ─────────────────────────────────────────────
 const demoOrgIds = new Map<string, string>()
-const DEFAULT_PR_DEMO_ORG_SLUG = 'applirank-pr-demo'
+const DEFAULT_PREVIEW_DEMO_ORG_SLUG = 'applirank-demo'
 
 const PUBLIC_APPLY_PATH_REGEX = /^\/api\/public\/jobs\/([^/]+)\/apply\/?$/
 
@@ -33,7 +33,7 @@ function getConfiguredDemoSlugs(): string[] {
   }
 
   if (isRailwayPreviewEnvironment(env.RAILWAY_ENVIRONMENT_NAME)) {
-    slugs.add(DEFAULT_PR_DEMO_ORG_SLUG)
+    slugs.add(DEFAULT_PREVIEW_DEMO_ORG_SLUG)
   }
 
   return [...slugs]

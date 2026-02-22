@@ -55,18 +55,17 @@ export default defineNuxtConfig({
   runtimeConfig: {
     public: {
       /** When set, the dashboard shows a read-only demo banner for this org slug */
-      demoOrgSlug: process.env.DEMO_ORG_SLUG || (isRailwayPreview ? 'applirank-pr-demo' : ''),
+      demoOrgSlug: process.env.DEMO_ORG_SLUG || (isRailwayPreview ? 'applirank-demo' : ''),
       /** Public live-demo account email used to prefill sign-in */
       liveDemoEmail:
         process.env.LIVE_DEMO_EMAIL
         || process.env.DEMO_EMAIL
-        || (isRailwayPreview ? 'pr.user1@applirank.dev' : 'demo@applirank.com'),
+        || 'demo@applirank.com',
       /** Public URL for hosted plan upsell CTA shown in preview mode modals */
       hostedPlanUrl: process.env.NUXT_PUBLIC_HOSTED_PLAN_URL || 'https://applirank.com',
       /** Public live-demo secret used to prefill sign-in */
       liveDemoSecret:
         process.env.LIVE_DEMO_SECRET
-        || process.env.PR_SEED_PASSWORD
         || process.env.DEMO_PASSWORD
         || 'demo1234',
       /** Whether in-app feedback via GitHub Issues is enabled */
