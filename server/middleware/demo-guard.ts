@@ -25,18 +25,26 @@ function throwDemoReadOnlyError(): never {
   throw createPreviewReadOnlyError()
 }
 
-function getConfiguredDemoSlugs(): string[] {
+interface DemoSlugsResult {
+  slugs: string[]
+  /** True only when DEMO_ORG_SLUG was explicitly set by the operator. */
+  isExplicitlyConfigured: boolean
+}
+
+function getConfiguredDemoSlugs(): DemoSlugsResult {
   const slugs = new Set<string>()
+  let isExplicitlyConfigured = false
 
   if (env.DEMO_ORG_SLUG) {
     slugs.add(env.DEMO_ORG_SLUG)
+    isExplicitlyConfigured = true
   }
 
   if (isRailwayPreviewEnvironment(env.RAILWAY_ENVIRONMENT_NAME)) {
     slugs.add(DEFAULT_PREVIEW_DEMO_ORG_SLUG)
   }
 
-  return [...slugs]
+  return { slugs: [...slugs], isExplicitlyConfigured }
 }
 
 async function getDemoOrgIds(slugs: string[]): Promise<Set<string>> {
@@ -77,7 +85,7 @@ export default defineEventHandler(async (event) => {
   // Always allow auth routes (sign-in, sign-out, session, org switch)
   if (path.startsWith('/api/auth/')) return
 
-  const demoSlugs = getConfiguredDemoSlugs()
+  const { slugs: demoSlugs, isExplicitlyConfigured } = getConfiguredDemoSlugs()
   if (demoSlugs.length === 0) return
 
   // Only guard write operations
@@ -85,7 +93,12 @@ export default defineEventHandler(async (event) => {
 
   const guardedOrgIds = await getDemoOrgIds(demoSlugs)
   if (guardedOrgIds.size === 0) {
-    if (import.meta.dev) return
+    // In dev or PR/preview environments the demo org may not exist yet
+    // (seed hasn't run, fresh DB, etc.) — pass through silently.
+    // Only surface a hard error in production-like environments where an
+    // explicitly configured DEMO_ORG_SLUG MUST resolve.
+    const isPreview = isRailwayPreviewEnvironment(env.RAILWAY_ENVIRONMENT_NAME)
+    if (!isExplicitlyConfigured || isPreview || import.meta.dev) return
 
     throw createError({
       statusCode: 503,

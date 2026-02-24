@@ -45,176 +45,84 @@ Most recruiting software holds your candidate data hostage behind per-seat prici
 
 ## Quick Start
 
-> **TL;DR for experienced developers:**
-> ```bash
-> git clone https://github.com/applirank/applirank.git && cd applirank
-> cp .env.example .env          # then edit passwords (see below)
-> docker compose up -d           # start Postgres + MinIO
-> docker compose ps              # verify all services are healthy
-> npm install && npm run dev     # app → http://localhost:3000
-> ```
-
----
-
-### Prerequisites
-
-Install **Git**, **Node.js** (v20+), and **Docker**. Expand your OS below for one-click instructions.
-
-<details>
-<summary><strong>🐧 Linux (Ubuntu / Debian)</strong></summary>
-
-```bash
-# 1. Git
-sudo apt update && sudo apt install -y git
-
-# 2. Node.js (LTS) via NodeSource
-curl -fsSL https://deb.nodesource.com/setup_lts.x -o nodesource_setup.sh
-sudo -E bash nodesource_setup.sh
-sudo apt install -y nodejs
-
-# 3. Docker Engine
-sudo apt install -y ca-certificates curl
-sudo install -m 0755 -d /etc/apt/keyrings
-sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
-sudo chmod a+r /etc/apt/keyrings/docker.asc
-sudo tee /etc/apt/sources.list.d/docker.sources <<EOF
-Types: deb
-URIs: https://download.docker.com/linux/ubuntu
-Suites: $(. /etc/os-release && echo "${UBUNTU_CODENAME:-$VERSION_CODENAME}")
-Components: stable
-Signed-By: /etc/apt/keyrings/docker.asc
-EOF
-sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
-
-# 4. Start Docker and enable it on boot
-sudo systemctl start docker
-sudo systemctl enable docker
-
-# 5. Let your user run Docker without sudo (log out & back in after this)
-sudo usermod -aG docker $USER
-```
-
-> **Debian users:** Replace `ubuntu` with `debian` in the `URIs` line. For other distros see [Docker docs](https://docs.docker.com/engine/install/).
->
-> **No systemctl?** (containers, WSL1, etc.) Run `sudo dockerd &` to start Docker manually.
-
-</details>
-
-<details>
-<summary><strong>🍎 macOS</strong></summary>
-
-```bash
-# 1. Install Homebrew (if you don't have it)
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# 2. Install Git, Node.js, and Docker Desktop
-brew install git node
-brew install --cask docker
-```
-
-After installing, **open Docker Desktop** from Applications and wait for it to start.
-
-</details>
-
-<details>
-<summary><strong>🪟 Windows</strong></summary>
-
-Download and install these three things (accept all defaults):
-
-1. **Git** → [git-scm.com/downloads/win](https://git-scm.com/downloads/win)
-2. **Node.js LTS** → [nodejs.org](https://nodejs.org) (click the big LTS button)
-3. **Docker Desktop** → [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop/) — check **"Use WSL 2"** during install, restart when asked
-
-After restarting, open **Docker Desktop** and wait until it says "running". Use **Git Bash** or **PowerShell** for the steps below.
-
-> If Docker complains about WSL 2, run `wsl --install` in PowerShell (as Admin) and restart.
-
-</details>
-
----
-
-### Installation
+You only need **Git** and **Docker** (with Docker Compose). No Node.js required.
 
 ```bash
 git clone https://github.com/applirank/applirank.git
 cd applirank
-cp .env.example .env              # then edit passwords (see below)
+./setup.sh           # generates .env with random secrets
+docker compose up    # builds the app and starts everything
 ```
 
-Start the infrastructure first and **make sure it's healthy** before launching the app:
+That's it. Open **http://localhost:3000**.
 
-```bash
-docker compose up -d              # start Postgres + MinIO
-docker compose ps                 # ← all services should show "running" / "healthy"
-```
+> **Windows?** Run `setup.sh` in Git Bash, or see the [manual setup](#manual-env-setup) below.
 
-Then install and start the app:
-
-```bash
-npm install && npm run dev        # app → http://localhost:3000
-```
-
-Migrations and S3 bucket creation happen automatically on first run.
-
-### Configure `.env`
-
-Open `.env` and change the `changeme` values. The key rule: **passwords must match their counterparts**.
-
-| Variable | Must match |
-|----------|------------|
-| `DB_PASSWORD` | the password in `DATABASE_URL` |
-| `STORAGE_PASSWORD` | `S3_SECRET_KEY` |
-| `DB_USER` / `STORAGE_USER` | `DATABASE_URL` username / `S3_ACCESS_KEY` |
-
-Generate an auth secret:
-```bash
-# macOS / Linux
-openssl rand -base64 32
-
-# Windows (PowerShell)
-[Convert]::ToBase64String((1..32 | ForEach-Object { Get-Random -Max 256 }) -as [byte[]])
-```
-
-Paste the output as `BETTER_AUTH_SECRET`.
+Migrations and the S3 bucket are created automatically on first boot.
 
 ### Seed demo data (optional)
 
+Once the app is running, create a demo account in a second terminal:
+
 ```bash
-npm run db:seed
-# Creates demo user: demo@applirank.com / demo1234
+docker compose exec app npm run db:seed
+# Login: demo@applirank.com / demo1234
 ```
 
-### Useful local URLs
+### Local URLs
 
-| Service | URL |
-|---------|-----|
-| **App** | [localhost:3000](http://localhost:3000) |
-| **Adminer** (DB browser) | [localhost:8080](http://localhost:8080) |
-| **MinIO Console** | [localhost:9001](http://localhost:9001) |
+| Service | URL | Notes |
+|---------|-----|-------|
+| **App** | [localhost:3000](http://localhost:3000) | |
+| **MinIO Console** | [localhost:9001](http://localhost:9001) | S3 browser |
+| **Adminer** (DB browser) | [localhost:8080](http://localhost:8080) | Run with `--profile tools` (see below) |
 
 ### Stopping and restarting
 
 ```bash
-docker compose down              # stop (keeps data)
-docker compose up -d && npm run dev  # start again
+docker compose down        # stop (keeps data)
+docker compose up          # start again (no rebuild needed)
 
-docker compose down -v           # stop + delete all data
+docker compose up --build  # rebuild the app image (after code changes)
+docker compose down -v     # stop + delete all data
 ```
 
-<details>
-<summary><strong>Troubleshooting</strong></summary>
+### Adminer (optional DB browser)
+
+Adminer is hidden by default to keep `docker compose up` clean. Enable it with:
+
+```bash
+docker compose --profile tools up
+# Adminer → http://localhost:8080
+# System: PostgreSQL | Server: db | Username/Password: from your .env
+```
+
+### Manual .env setup
+
+If `setup.sh` isn't available (Windows CMD, CI, etc.), create `.env` manually:
+
+```bash
+cp .env.example .env
+```
+
+Then replace the placeholder values:
+
+| Variable | How to generate |
+|----------|----------------|
+| `DB_PASSWORD` / `STORAGE_PASSWORD` | Any random string |
+| `BETTER_AUTH_SECRET` | `openssl rand -base64 32` |
+
+The `DATABASE_URL` and `S3_ENDPOINT` in `.env` are for host tools (e.g. `drizzle-kit`). Docker Compose automatically uses the correct internal hostnames for the app container — no manual editing needed.
+
+### Troubleshooting
 
 | Problem | Fix |
 |---------|-----|
 | `docker: command not found` | Docker isn't installed or Docker Desktop isn't running |
-| `docker compose` fails | Make sure Docker Desktop is **running**. On Linux, log out & back in after `usermod` |
-| Port 5432 already in use | Another Postgres is running — stop it or change the port in `docker-compose.yml` |
-| Database connection errors | Check `DATABASE_URL` matches `DB_USER` + `DB_PASSWORD` in `.env` |
-| MinIO / S3 errors | Check `S3_ACCESS_KEY` matches `STORAGE_USER` and `S3_SECRET_KEY` matches `STORAGE_PASSWORD` |
-| `EACCES` on npm install | Don't use `sudo`. See [npm docs](https://docs.npmjs.com/resolving-eacces-permissions-errors-when-installing-packages-globally) |
-
-</details>
+| App shows connection error | Wait 30 s for the first build to finish, then reload |
+| Port 3000 / 5432 already in use | Stop the conflicting process or change the port in `docker-compose.yml` |
+| S3 / upload errors | Run `docker compose logs minio` — MinIO may still be starting |
+| Need to change a secret | Edit `.env`, then `docker compose up --build` |
 
 ## Tech Stack
 
@@ -243,7 +151,9 @@ server/                       # Backend (Nitro)
   database/migrations/        #   Generated SQL migrations
   utils/                      #   Auto-imported utilities (db, auth, env, s3)
   plugins/                    #   Startup plugins (migrations, S3 bucket)
-docker-compose.yml            # Postgres + MinIO + Adminer
+Dockerfile                    # Multi-stage build for the app container
+docker-compose.yml            # App + Postgres + MinIO (+ optional Adminer)
+setup.sh                      # One-time secret generator → writes .env
 ```
 
 ## Deployment
