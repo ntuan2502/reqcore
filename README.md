@@ -45,84 +45,143 @@ Most recruiting software holds your candidate data hostage behind per-seat prici
 
 ## Quick Start
 
-You only need **Git** and **Docker** (with Docker Compose). No Node.js required.
+> **Windows users:** Open [Git Bash](https://gitforwindows.org) and run all commands there instead of Command Prompt or PowerShell.
+
+---
+
+### Step 1 — Install Docker
+
+Docker packages the app, database, and file storage into containers so you don't have to install anything else manually.
+
+| Your OS | How to install |
+|---------|---------------|
+| **Mac** | [Download Docker Desktop for Mac](https://www.docker.com/products/docker-desktop/) → install → open it |
+| **Windows** | [Download Docker Desktop for Windows](https://www.docker.com/products/docker-desktop/) → install → open it |
+| **Linux** | Follow the [Docker Engine install guide](https://docs.docker.com/engine/install/) for your distro |
+
+Once installed, verify Docker is running:
+
+```bash
+docker --version
+```
+
+You should see something like `Docker version 27.x.x`. If you get `command not found`, Docker isn't running yet — open Docker Desktop and try again.
+
+---
+
+### Step 2 — Download Applirank
+
+Clone the repository (this downloads the source code):
 
 ```bash
 git clone https://github.com/applirank/applirank.git
 cd applirank
-./setup.sh           # generates .env with random secrets
-docker compose up    # builds the app and starts everything
 ```
 
-That's it. Open **http://localhost:3000**.
+> Don't have `git`? [Download it here](https://git-scm.com/downloads), or [download a ZIP](https://github.com/applirank/applirank/archive/refs/heads/main.zip) and unzip it manually.
 
-> **Windows?** Run `setup.sh` in Git Bash, or see the [manual setup](#manual-env-setup) below.
+---
 
-Migrations and the S3 bucket are created automatically on first boot.
+### Step 3 — Generate your secret keys
 
-### Seed demo data (optional)
+This creates a `.env` file containing random passwords and secrets. You only run this once.
 
-Once the app is running, create a demo account in a second terminal:
+```bash
+./setup.sh
+```
+
+You'll see: `✅ .env generated with random secrets.`
+
+> **Windows CMD / PowerShell?** Run `cp .env.example .env` instead, then open `.env` and replace every placeholder value with a random string of your choice.
+
+---
+
+### Step 4 — Start the app
+
+```bash
+docker compose up
+```
+
+**The very first run takes 3–5 minutes** while Docker builds the app image and downloads dependencies. This is normal — you only wait this long once. Subsequent starts take seconds.
+
+When you see a line like:
+
+```
+app  | Listening on http://[::]:3000
+```
+
+...the app is ready.
+
+---
+
+### Step 5 — Open Applirank
+
+Go to **[http://localhost:3000](http://localhost:3000)** in your browser.
+
+Click **Sign up** to create your account and first organization. That's it — you're running your own ATS.
+
+---
+
+### Optional: Load demo data
+
+Want to explore with pre-filled jobs, candidates, and a pipeline? Open a **new terminal window** while the app is running and run:
 
 ```bash
 docker compose exec app npm run db:seed
-# Login: demo@applirank.com / demo1234
 ```
 
-### Local URLs
+Then sign in with:
+- **Email:** `demo@applirank.com`
+- **Password:** `demo1234`
 
-| Service | URL | Notes |
-|---------|-----|-------|
-| **App** | [localhost:3000](http://localhost:3000) | |
-| **MinIO Console** | [localhost:9001](http://localhost:9001) | S3 browser |
-| **Adminer** (DB browser) | [localhost:8080](http://localhost:8080) | Run with `--profile tools` (see below) |
+---
 
-### Stopping and restarting
+### Managing your instance
 
 ```bash
-docker compose down        # stop (keeps data)
-docker compose up          # start again (no rebuild needed)
+# Stop the app (your data is kept)
+docker compose down
 
-docker compose up --build  # rebuild the app image (after code changes)
-docker compose down -v     # stop + delete all data
+# Start it again
+docker compose up
+
+# Rebuild after pulling new code
+docker compose up --build
+
+# Stop and delete ALL data (irreversible)
+docker compose down -v
 ```
 
-### Adminer (optional DB browser)
+---
 
-Adminer is hidden by default to keep `docker compose up` clean. Enable it with:
+### What's running
+
+| Service | URL | Description |
+|---------|-----|-------------|
+| **App** | [localhost:3000](http://localhost:3000) | The Applirank web UI |
+| **MinIO Console** | [localhost:9001](http://localhost:9001) | File storage browser (S3-compatible) |
+| **Adminer** | [localhost:8080](http://localhost:8080) | Database browser — only with `--profile tools` |
+
+To enable Adminer (a visual database browser):
 
 ```bash
 docker compose --profile tools up
-# Adminer → http://localhost:8080
-# System: PostgreSQL | Server: db | Username/Password: from your .env
+# Open http://localhost:8080
+# System: PostgreSQL  |  Server: db  |  Username & Password: from your .env
 ```
 
-### Manual .env setup
-
-If `setup.sh` isn't available (Windows CMD, CI, etc.), create `.env` manually:
-
-```bash
-cp .env.example .env
-```
-
-Then replace the placeholder values:
-
-| Variable | How to generate |
-|----------|----------------|
-| `DB_PASSWORD` / `STORAGE_PASSWORD` | Any random string |
-| `BETTER_AUTH_SECRET` | `openssl rand -base64 32` |
-
-The `DATABASE_URL` and `S3_ENDPOINT` in `.env` are for host tools (e.g. `drizzle-kit`). Docker Compose automatically uses the correct internal hostnames for the app container — no manual editing needed.
+---
 
 ### Troubleshooting
 
-| Problem | Fix |
-|---------|-----|
-| `docker: command not found` | Docker isn't installed or Docker Desktop isn't running |
-| App shows connection error | Wait 30 s for the first build to finish, then reload |
-| Port 3000 / 5432 already in use | Stop the conflicting process or change the port in `docker-compose.yml` |
-| S3 / upload errors | Run `docker compose logs minio` — MinIO may still be starting |
-| Need to change a secret | Edit `.env`, then `docker compose up --build` |
+| Problem | What to do |
+|---------|-----------|
+| `docker: command not found` | Docker isn't installed, or Docker Desktop isn't open yet |
+| `permission denied: ./setup.sh` | Run `chmod +x setup.sh` first, then try again |
+| App shows a connection error | The first build is still running — wait 30 seconds, then refresh |
+| Port 3000 or 5432 already in use | Another app is using that port — stop it, or edit the port in `docker-compose.yml` |
+| Upload / file errors | Run `docker compose logs minio` — MinIO may still be starting up |
+| Need to rotate a secret | Edit `.env`, then run `docker compose up --build` |
 
 ## Tech Stack
 
