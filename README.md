@@ -42,6 +42,7 @@ Most recruiting software holds your candidate data hostage behind per-seat prici
 - **Multi-tenant organizations** — Isolated data per organization with role-based membership
 - **Recruiter dashboard** — At-a-glance stats, pipeline breakdown, recent applications, and top active jobs
 - **Server-proxied documents** — Resumes are never exposed via public URLs; all access is authenticated and streamed
+- **API rate limiting** — Global per-IP limits on all `/api` endpoints with stricter auth/write thresholds
 
 ## Quick Start
 
