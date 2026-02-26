@@ -1,5 +1,16 @@
 <script setup lang="ts">
-import { ArrowLeft } from 'lucide-vue-next'
+import {
+  ArrowLeft,
+  Check,
+  Plus,
+  Pencil,
+  Trash2,
+  ChevronUp,
+  ChevronDown,
+  GripVertical,
+  Link2,
+  ClipboardCopy,
+} from 'lucide-vue-next'
 import { z } from 'zod'
 
 definePageMeta({
@@ -13,6 +24,26 @@ useSeoMeta({
 })
 
 const { createJob } = useJobs()
+
+type QuestionType =
+  | 'short_text'
+  | 'long_text'
+  | 'single_select'
+  | 'multi_select'
+  | 'number'
+  | 'date'
+  | 'url'
+  | 'checkbox'
+  | 'file_upload'
+
+type DraftQuestion = {
+  id: string
+  label: string
+  type: QuestionType
+  description?: string | null
+  required: boolean
+  options?: string[] | null
+}
 
 // Wizard state
 const currentStep = ref<1 | 2 | 3>(1)
@@ -34,9 +65,7 @@ const form = ref({
 const applicationForm = ref({
   requireResume: true,
   requireCoverLetter: false,
-  questions: [
-    // Up to 5 short questions
-  ] as string[],
+  questions: [] as DraftQuestion[],
 })
 
 // Step 3: Find candidates (client-only for now)
@@ -50,6 +79,11 @@ const findCandidates = ref({
 const isSubmitting = ref(false)
 const errors = ref<Record<string, string>>({})
 const submitError = ref<string | null>(null)
+const showAddForm = ref(false)
+const editingQuestion = ref<DraftQuestion | null>(null)
+const linkCopied = ref(false)
+const questionActionError = ref<string | null>(null)
+const nextQuestionId = ref(1)
 
 // Validation (only Step 1 is required to submit)
 const formSchema = z.object({
@@ -92,13 +126,96 @@ function prevStep() {
   if (currentStep.value > 1) currentStep.value--
 }
 
-function addQuestion() {
+function handleAddQuestion(data: {
+  label: string
+  type: string
+  description?: string
+  required: boolean
+  options?: string[]
+}) {
   if (applicationForm.value.questions.length >= 5) return
-  applicationForm.value.questions.push('')
+
+  applicationForm.value.questions.push({
+    id: `draft-${nextQuestionId.value++}`,
+    label: data.label,
+    type: data.type as QuestionType,
+    description: data.description ?? null,
+    required: data.required,
+    options: data.options ?? null,
+  })
+  showAddForm.value = false
+  questionActionError.value = null
 }
 
-function removeQuestion(index: number) {
+function handleUpdateQuestion(data: {
+  label: string
+  type: string
+  description?: string
+  required: boolean
+  options?: string[]
+}) {
+  if (!editingQuestion.value) return
+
+  const index = applicationForm.value.questions.findIndex((q) => q.id === editingQuestion.value?.id)
+  if (index === -1) return
+
+  applicationForm.value.questions[index] = {
+    ...applicationForm.value.questions[index],
+    label: data.label,
+    type: data.type as QuestionType,
+    description: data.description ?? null,
+    required: data.required,
+    options: data.options ?? null,
+  }
+  editingQuestion.value = null
+  questionActionError.value = null
+}
+
+function handleDeleteQuestion(questionId: string) {
+  const index = applicationForm.value.questions.findIndex((q) => q.id === questionId)
+  if (index === -1) return
   applicationForm.value.questions.splice(index, 1)
+  if (editingQuestion.value?.id === questionId) {
+    editingQuestion.value = null
+  }
+  questionActionError.value = null
+}
+
+function moveQuestion(index: number, direction: 'up' | 'down') {
+  const list = applicationForm.value.questions
+  const targetIndex = direction === 'up' ? index - 1 : index + 1
+  if (targetIndex < 0 || targetIndex >= list.length) return
+  ;[list[index], list[targetIndex]] = [list[targetIndex], list[index]]
+}
+
+function slugifyTitle(raw: string) {
+  return raw
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/[\s_]+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
+    .slice(0, 60)
+}
+
+const requestUrl = useRequestURL()
+const applicationLink = computed(() => {
+  const base = `${requestUrl.protocol}//${requestUrl.host}`
+  const slugBase = slugifyTitle(form.value.title) || 'new-job'
+  return `${base}/jobs/${slugBase}-xxxxxxxx/apply`
+})
+
+async function copyApplicationLink() {
+  try {
+    await navigator.clipboard.writeText(applicationLink.value)
+    linkCopied.value = true
+    setTimeout(() => {
+      linkCopied.value = false
+    }, 2000)
+  } catch {
+    // ignore clipboard issues silently
+  }
 }
 
 function addSkillFromInput(e: Event) {
@@ -131,13 +248,31 @@ async function handleSubmit() {
 
   isSubmitting.value = true
   try {
-    await createJob({
+    const created = await createJob({
       title: form.value.title,
       description: form.value.description || undefined,
       location: form.value.location || undefined,
       type: form.value.type,
     })
-    // NOTE: applicationForm & findCandidates are client-only for now
+
+    if (applicationForm.value.questions.length > 0 && created?.id) {
+      await Promise.all(
+        applicationForm.value.questions.map((question, index) => (
+          $fetch(`/api/jobs/${created.id}/questions`, {
+            method: 'POST',
+            body: {
+              label: question.label,
+              type: question.type,
+              description: question.description || undefined,
+              required: question.required,
+              options: question.options || undefined,
+              displayOrder: index,
+            },
+          })
+        )),
+      )
+    }
+
     await navigateTo('/dashboard/jobs')
   } catch (err: any) {
     submitError.value = err?.data?.statusMessage ?? 'Something went wrong'
@@ -152,6 +287,18 @@ const typeOptions = [
   { value: 'contract', label: 'Contract' },
   { value: 'internship', label: 'Internship' },
 ]
+
+const questionTypeLabels: Record<QuestionType, string> = {
+  short_text: 'Short Text',
+  long_text: 'Long Text',
+  single_select: 'Single Select',
+  multi_select: 'Multi Select',
+  number: 'Number',
+  date: 'Date',
+  url: 'URL',
+  checkbox: 'Checkbox',
+  file_upload: 'File Upload',
+}
 </script>
 
 <template>
@@ -325,54 +472,187 @@ const typeOptions = [
 
             <!-- Step 2: Application form -->
             <section v-else-if="currentStep === 2" class="space-y-8">
+              <div class="rounded-lg border border-brand-200 dark:border-brand-800 bg-brand-50 dark:bg-brand-950 p-5">
+                <div class="flex items-center gap-2 mb-2">
+                  <Link2 class="size-4 text-brand-600 dark:text-brand-400" />
+                  <h2 class="text-sm font-semibold text-brand-700 dark:text-brand-300">Application Link</h2>
+                </div>
+                <p class="text-xs text-surface-600 dark:text-surface-400 mb-3">
+                  This preview link will be generated when the job is created.
+                </p>
+                <div class="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readonly
+                    :value="applicationLink"
+                    class="flex-1 rounded-lg border border-brand-200 dark:border-brand-800 bg-white dark:bg-surface-900 px-3 py-1.5 text-sm text-surface-700 dark:text-surface-300 select-all"
+                  />
+                  <button
+                    type="button"
+                    class="inline-flex items-center gap-1.5 rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-brand-700 transition-colors"
+                    @click="copyApplicationLink"
+                  >
+                    <ClipboardCopy class="size-3.5" />
+                    {{ linkCopied ? 'Copied!' : 'Copy' }}
+                  </button>
+                </div>
+              </div>
+
               <div>
                 <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-100 mb-6 pb-2 border-b border-surface-100 dark:border-surface-800">Application requirements</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <label class="flex items-center gap-3 p-4 rounded-xl border border-surface-200 dark:border-surface-800 cursor-pointer hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-colors">
-                    <input type="checkbox" v-model="applicationForm.requireResume" class="size-4 rounded border-surface-300 dark:border-surface-700 text-brand-600 focus:ring-brand-500" />
+                  <button
+                    type="button"
+                    class="relative flex items-center gap-3 p-4 rounded-xl border text-left transition-colors"
+                    :class="applicationForm.requireResume
+                      ? 'border-brand-300 dark:border-brand-700 bg-brand-50/70 dark:bg-brand-950/30'
+                      : 'border-surface-200 dark:border-surface-800 hover:bg-surface-50 dark:hover:bg-surface-800/50'"
+                    :aria-pressed="applicationForm.requireResume"
+                    @click="applicationForm.requireResume = !applicationForm.requireResume"
+                  >
+                    <span
+                      v-if="applicationForm.requireResume"
+                      class="absolute top-3 right-3 inline-flex items-center justify-center size-5 rounded-full bg-brand-600 text-white"
+                      aria-hidden="true"
+                    >
+                      <Check class="size-3" />
+                    </span>
                     <div>
                       <span class="block text-sm font-medium text-surface-900 dark:text-surface-100">Require resume/CV</span>
                       <span class="text-xs text-surface-500">Candidates must upload a file.</span>
                     </div>
-                  </label>
-                  <label class="flex items-center gap-3 p-4 rounded-xl border border-surface-200 dark:border-surface-800 cursor-pointer hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-colors">
-                    <input type="checkbox" v-model="applicationForm.requireCoverLetter" class="size-4 rounded border-surface-300 dark:border-surface-700 text-brand-600 focus:ring-brand-500" />
+                  </button>
+                  <button
+                    type="button"
+                    class="relative flex items-center gap-3 p-4 rounded-xl border text-left transition-colors"
+                    :class="applicationForm.requireCoverLetter
+                      ? 'border-brand-300 dark:border-brand-700 bg-brand-50/70 dark:bg-brand-950/30'
+                      : 'border-surface-200 dark:border-surface-800 hover:bg-surface-50 dark:hover:bg-surface-800/50'"
+                    :aria-pressed="applicationForm.requireCoverLetter"
+                    @click="applicationForm.requireCoverLetter = !applicationForm.requireCoverLetter"
+                  >
+                    <span
+                      v-if="applicationForm.requireCoverLetter"
+                      class="absolute top-3 right-3 inline-flex items-center justify-center size-5 rounded-full bg-brand-600 text-white"
+                      aria-hidden="true"
+                    >
+                      <Check class="size-3" />
+                    </span>
                     <div>
                       <span class="block text-sm font-medium text-surface-900 dark:text-surface-100">Ask for cover letter</span>
                       <span class="text-xs text-surface-500">Optional for candidates.</span>
                     </div>
-                  </label>
+                  </button>
                 </div>
               </div>
 
               <div>
                 <div class="flex items-center justify-between mb-6 pb-2 border-b border-surface-100 dark:border-surface-800">
                   <h2 class="text-lg font-semibold text-surface-900 dark:text-surface-100">Custom questions</h2>
-                  <button type="button" @click="addQuestion" :disabled="applicationForm.questions.length >= 5" class="inline-flex items-center px-3 py-1.5 text-sm font-medium text-brand-600 hover:bg-brand-50 dark:hover:bg-brand-950 rounded-lg transition-colors disabled:opacity-50">
-                    + Add question
-                  </button>
                 </div>
-                <div class="space-y-4">
-                  <div v-for="(q, idx) in applicationForm.questions" :key="idx" class="flex items-center gap-3">
-                    <div class="flex-1">
-                      <input
-                        v-model="applicationForm.questions[idx]"
-                        type="text"
-                        placeholder="e.g. What is your experience with Vue.js?"
-                        class="w-full rounded-lg border px-3 py-2.5 text-sm bg-white dark:bg-surface-900 text-surface-900 dark:text-surface-100 border-surface-300 dark:border-surface-700 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
-                      />
+                <div
+                  v-if="questionActionError"
+                  class="rounded-lg border border-danger-200 dark:border-danger-800 bg-danger-50 dark:bg-danger-950 p-3 text-sm text-danger-700 dark:text-danger-400 mb-4"
+                >
+                  {{ questionActionError }}
+                  <button class="ml-2 underline" @click="questionActionError = null">Dismiss</button>
+                </div>
+
+                <div v-if="applicationForm.questions.length > 0" class="space-y-2 mb-4">
+                  <div
+                    v-for="(q, index) in applicationForm.questions"
+                    :key="q.id"
+                    class="flex items-center gap-3 rounded-lg border border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 p-3 group"
+                  >
+                    <div class="text-surface-300">
+                      <GripVertical class="size-4" />
                     </div>
-                    <button type="button" @click="removeQuestion(idx)" class="p-2 text-surface-400 hover:text-danger-600 transition-colors">
-                      <span class="sr-only">Remove</span>
-                      <svg class="size-5" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
-                      </svg>
-                    </button>
-                  </div>
-                  <div v-if="applicationForm.questions.length === 0" class="text-center py-8 border-2 border-dashed border-surface-200 dark:border-surface-800 rounded-xl">
-                    <p class="text-sm text-surface-500">No custom questions added yet.</p>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-center gap-2">
+                        <span class="text-sm font-medium text-surface-900 dark:text-surface-100 truncate">{{ q.label }}</span>
+                        <span v-if="q.required" class="text-xs text-danger-500 font-medium">Required</span>
+                      </div>
+                      <div class="flex items-center gap-2 mt-0.5">
+                        <span class="text-xs text-surface-400">{{ questionTypeLabels[q.type] ?? q.type }}</span>
+                        <span v-if="q.description" class="text-xs text-surface-400 truncate">
+                          - {{ q.description }}
+                        </span>
+                        <span
+                          v-if="(q.type === 'single_select' || q.type === 'multi_select') && q.options"
+                          class="text-xs text-surface-400"
+                        >
+                          · {{ q.options.length }} options
+                        </span>
+                      </div>
+                    </div>
+                    <div class="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity shrink-0">
+                      <button
+                        type="button"
+                        :disabled="index === 0"
+                        class="rounded p-1 text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors disabled:opacity-30"
+                        title="Move up"
+                        @click="moveQuestion(index, 'up')"
+                      >
+                        <ChevronUp class="size-4" />
+                      </button>
+                      <button
+                        type="button"
+                        :disabled="index === applicationForm.questions.length - 1"
+                        class="rounded p-1 text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors disabled:opacity-30"
+                        title="Move down"
+                        @click="moveQuestion(index, 'down')"
+                      >
+                        <ChevronDown class="size-4" />
+                      </button>
+                      <button
+                        type="button"
+                        class="rounded p-1 text-surface-400 hover:text-surface-600 dark:hover:text-surface-200 hover:bg-surface-100 dark:hover:bg-surface-800 transition-colors"
+                        title="Edit"
+                        @click="editingQuestion = q; showAddForm = false"
+                      >
+                        <Pencil class="size-4" />
+                      </button>
+                      <button
+                        type="button"
+                        class="rounded p-1 text-surface-400 hover:text-danger-600 dark:hover:text-danger-400 hover:bg-danger-50 dark:hover:bg-danger-950 transition-colors"
+                        title="Delete"
+                        @click="handleDeleteQuestion(q.id)"
+                      >
+                        <Trash2 class="size-4" />
+                      </button>
+                    </div>
                   </div>
                 </div>
+
+                <p v-else class="text-sm text-surface-400 py-4">
+                  No custom questions yet. Applicants will see only the standard fields (name, email, phone).
+                </p>
+
+                <QuestionForm
+                  v-if="editingQuestion"
+                  :question="editingQuestion"
+                  class="mb-4"
+                  @save="handleUpdateQuestion"
+                  @cancel="editingQuestion = null"
+                />
+
+                <QuestionForm
+                  v-if="showAddForm && !editingQuestion"
+                  class="mb-4"
+                  @save="handleAddQuestion"
+                  @cancel="showAddForm = false"
+                />
+
+                <button
+                  v-if="!showAddForm && !editingQuestion"
+                  type="button"
+                  :disabled="applicationForm.questions.length >= 5"
+                  class="inline-flex items-center gap-1.5 rounded-lg border border-dashed border-surface-300 dark:border-surface-700 px-3 py-2 text-sm font-medium text-surface-600 dark:text-surface-400 hover:border-brand-400 dark:hover:border-brand-600 hover:text-brand-600 dark:hover:text-brand-400 hover:bg-brand-50 dark:hover:bg-brand-950 transition-colors disabled:opacity-50"
+                  @click="showAddForm = true"
+                >
+                  <Plus class="size-4" />
+                  Add Question
+                </button>
               </div>
             </section>
 
@@ -427,13 +707,27 @@ const typeOptions = [
               </div>
 
               <div class="pt-4">
-                <label class="flex items-center gap-3 p-4 rounded-xl border border-surface-200 dark:border-surface-800 cursor-pointer hover:bg-surface-50 dark:hover:bg-surface-800/50 transition-colors">
-                  <input type="checkbox" v-model="findCandidates.enableSourcing" class="size-4 rounded border-surface-300 dark:border-surface-700 text-brand-600 focus:ring-brand-500" />
+                <button
+                  type="button"
+                  class="relative w-full flex items-center gap-3 p-4 rounded-xl border text-left transition-colors"
+                  :class="findCandidates.enableSourcing
+                    ? 'border-brand-300 dark:border-brand-700 bg-brand-50/70 dark:bg-brand-950/30'
+                    : 'border-surface-200 dark:border-surface-800 hover:bg-surface-50 dark:hover:bg-surface-800/50'"
+                  :aria-pressed="findCandidates.enableSourcing"
+                  @click="findCandidates.enableSourcing = !findCandidates.enableSourcing"
+                >
+                  <span
+                    v-if="findCandidates.enableSourcing"
+                    class="absolute top-3 right-3 inline-flex items-center justify-center size-5 rounded-full bg-brand-600 text-white"
+                    aria-hidden="true"
+                  >
+                    <Check class="size-3" />
+                  </span>
                   <div>
                     <span class="block text-sm font-medium text-surface-900 dark:text-surface-100">Enable candidate sourcing recommendations</span>
                     <span class="text-xs text-surface-500">Let AI help you find the best matches.</span>
                   </div>
-                </label>
+                </button>
               </div>
             </section>
 
@@ -518,3 +812,9 @@ const typeOptions = [
     </div>
   </div>
 </template>
+
+<style scoped>
+button:not(:disabled) {
+  cursor: pointer;
+}
+</style>
