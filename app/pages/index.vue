@@ -52,7 +52,7 @@ useSchemaOrg([
     name: 'Reqcore',
     url: 'https://reqcore.com',
     logo: 'https://reqcore.com/og-image.png',
-    sameAs: ['https://github.com/reqcore/reqcore'],
+    sameAs: ['https://github.com/reqcore-inc/reqcore'],
     description: 'Open-source applicant tracking system with transparent AI and full data ownership.',
   }),
   defineWebSite({
@@ -121,7 +121,7 @@ const ctaRef = useScrollFade()
             Blog
           </NuxtLink>
           <a
-            href="https://github.com/reqcore/reqcore"
+            href="https://github.com/reqcore-inc/reqcore"
             target="_blank"
             rel="noopener noreferrer"
             class="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-[13px] font-medium text-surface-400 transition hover:text-white"
@@ -169,7 +169,7 @@ const ctaRef = useScrollFade()
         <!-- Announcement badge -->
         <div class="hero-animate hero-delay-1 mb-10 flex items-center justify-center gap-4">
           <a
-            href="https://github.com/reqcore/reqcore"
+            href="https://github.com/reqcore-inc/reqcore"
             target="_blank"
             rel="noopener noreferrer"
             class="group inline-flex items-center gap-2 rounded-full border border-white/[0.08] bg-white/[0.03] px-4 py-1.5 text-[13px] font-medium text-surface-300 transition hover:border-white/[0.15] hover:bg-white/[0.06]"
@@ -820,7 +820,7 @@ const ctaRef = useScrollFade()
                   </div>
                   <!-- Terminal content -->
                   <div class="p-5 font-mono text-[12px] leading-[1.8] sm:p-6 sm:text-[13px]">
-                    <div class="text-surface-500">$ git clone https://github.com/reqcore/reqcore</div>
+                    <div class="text-surface-500">$ git clone https://github.com/reqcore-inc/reqcore</div>
                     <div class="text-surface-500">$ cd reqcore</div>
                     <div class="mt-1">
                       <span class="text-surface-500">$ </span><span class="text-brand-300">docker compose up</span>
@@ -1306,7 +1306,7 @@ const ctaRef = useScrollFade()
             <ArrowRight class="h-3.5 w-3.5" />
           </NuxtLink>
           <a
-            href="https://github.com/reqcore/reqcore"
+            href="https://github.com/reqcore-inc/reqcore"
             target="_blank"
             rel="noopener noreferrer"
             class="inline-flex items-center gap-2 rounded-lg border border-white/[0.1] bg-white/[0.03] px-5 py-2.5 text-sm font-semibold text-surface-300 transition hover:border-white/[0.2] hover:bg-white/[0.06] hover:text-white"
@@ -1333,7 +1333,7 @@ const ctaRef = useScrollFade()
             Blog
           </NuxtLink>
           <a
-            href="https://github.com/reqcore/reqcore"
+            href="https://github.com/reqcore-inc/reqcore"
             target="_blank"
             rel="noopener noreferrer"
             class="transition hover:text-white"
@@ -1341,7 +1341,7 @@ const ctaRef = useScrollFade()
             GitHub
           </a>
           <a
-            href="https://github.com/reqcore/reqcore/blob/main/README.md"
+            href="https://github.com/reqcore-inc/reqcore/blob/main/README.md"
             target="_blank"
             rel="noopener noreferrer"
             class="transition hover:text-white"
@@ -1349,7 +1349,7 @@ const ctaRef = useScrollFade()
             Docs
           </a>
           <a
-            href="https://github.com/reqcore/reqcore/blob/main/LICENSE"
+            href="https://github.com/reqcore-inc/reqcore/blob/main/LICENSE"
             target="_blank"
             rel="noopener noreferrer"
             class="transition hover:text-white"
