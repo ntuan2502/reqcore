@@ -142,3 +142,140 @@
     color: var(--color-surface-100);
   }
 }
+
+/* ── Premium fade-in animations (Linear-style) ─────────── */
+
+/* Hero stagger: plays immediately on load with delay offsets */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    filter: blur(6px);
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-scale {
+  from {
+    opacity: 0;
+    filter: blur(4px);
+    transform: translateY(32px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0px);
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Base class — elements start invisible */
+.hero-animate {
+  opacity: 0;
+  animation: fade-in-up 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.hero-animate-scale {
+  opacity: 0;
+  animation: fade-in-scale 1.1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Stagger delays */
+.hero-delay-1 { animation-delay: 0ms; }
+.hero-delay-2 { animation-delay: 100ms; }
+.hero-delay-3 { animation-delay: 200ms; }
+.hero-delay-4 { animation-delay: 340ms; }
+.hero-delay-5 { animation-delay: 500ms; }
+
+/* Scroll-triggered: starts hidden, revealed by IntersectionObserver */
+.scroll-fade {
+  opacity: 0;
+  transform: translateY(28px);
+  filter: blur(4px);
+  transition:
+    opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.8s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-fade.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0px);
+}
+
+/* Staggered children inside a scroll-fade container */
+.scroll-fade .stagger-child {
+  opacity: 0;
+  transform: translateY(20px);
+  filter: blur(3px);
+  transition:
+    opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.7s cubic-bezier(0.16, 1, 0.3, 1),
+    filter 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.scroll-fade.is-visible .stagger-child:nth-child(1) { opacity: 1; transform: translateY(0); filter: blur(0px); transition-delay: 0ms; }
+.scroll-fade.is-visible .stagger-child:nth-child(2) { opacity: 1; transform: translateY(0); filter: blur(0px); transition-delay: 80ms; }
+.scroll-fade.is-visible .stagger-child:nth-child(3) { opacity: 1; transform: translateY(0); filter: blur(0px); transition-delay: 160ms; }
+.scroll-fade.is-visible .stagger-child:nth-child(4) { opacity: 1; transform: translateY(0); filter: blur(0px); transition-delay: 240ms; }
+.scroll-fade.is-visible .stagger-child:nth-child(5) { opacity: 1; transform: translateY(0); filter: blur(0px); transition-delay: 320ms; }
+.scroll-fade.is-visible .stagger-child:nth-child(6) { opacity: 1; transform: translateY(0); filter: blur(0px); transition-delay: 400ms; }
+
+/* ── Bento card subtle border-glow (Supabase-style) ───── */
+.bento-card {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(255,255,255,0) 100%),
+    #0c0c0f;
+}
+
+.bento-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.02) 50%,
+    rgba(255, 255, 255, 0) 100%
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
+}
+
+.bento-card:hover {
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.005) 100%),
+    #0c0c0f;
+}
+
+/* ── How-it-works step number gradients ─────────────── */
+.how-step-number {
+  background: linear-gradient(135deg, var(--color-brand-300), var(--color-brand-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.how-step-number-accent {
+  background: linear-gradient(135deg, var(--color-accent-300), var(--color-accent-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.how-step-number-success {
+  background: linear-gradient(135deg, var(--color-success-300), var(--color-success-500));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
