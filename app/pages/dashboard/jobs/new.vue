@@ -159,8 +159,11 @@ function handleUpdateQuestion(data: {
   const index = applicationForm.value.questions.findIndex((q) => q.id === editingQuestion.value?.id)
   if (index === -1) return
 
+  const existingQuestion = applicationForm.value.questions[index]
+  if (!existingQuestion) return
+
   applicationForm.value.questions[index] = {
-    ...applicationForm.value.questions[index]!,
+    id: existingQuestion.id,
     label: data.label,
     type: data.type as QuestionType,
     description: data.description ?? null,

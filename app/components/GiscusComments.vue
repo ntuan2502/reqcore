@@ -10,9 +10,11 @@ const props = defineProps<{
 }>()
 
 const containerRef = ref<HTMLDivElement>()
+const runtimeConfig = useRuntimeConfig()
 
 function loadGiscus() {
   if (!containerRef.value) return
+  if (!runtimeConfig.public.giscusRepoId || !runtimeConfig.public.giscusCategoryId) return
 
   // Clear any existing widget
   containerRef.value.innerHTML = ''
@@ -20,9 +22,9 @@ function loadGiscus() {
   const script = document.createElement('script')
   script.src = 'https://giscus.app/client.js'
   script.setAttribute('data-repo', 'applirank/applirank')
-  script.setAttribute('data-repo-id', '')
+  script.setAttribute('data-repo-id', runtimeConfig.public.giscusRepoId)
   script.setAttribute('data-category', 'Feature Catalog')
-  script.setAttribute('data-category-id', '')
+  script.setAttribute('data-category-id', runtimeConfig.public.giscusCategoryId)
   script.setAttribute('data-mapping', 'specific')
   script.setAttribute('data-term', props.term)
   script.setAttribute('data-strict', '0')

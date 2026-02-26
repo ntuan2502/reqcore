@@ -325,6 +325,9 @@ const stats = computed(() => {
             class="border-b border-white/[0.04] last:border-b-0"
           >
             <button
+              type="button"
+              :aria-expanded="isExpanded(category.path)"
+              :aria-controls="`cat-panel-${category.path.replace(/\//g, '-')}`"
               class="flex w-full items-center gap-3 px-5 py-4 text-left transition hover:bg-white/[0.03]"
               @click="toggleExpand(category.path)"
             >
@@ -345,11 +348,15 @@ const stats = computed(() => {
 
             <!-- Features within category -->
             <div
+              :id="`cat-panel-${category.path.replace(/\//g, '-')}`"
               v-if="isExpanded(category.path)"
               class="border-t border-white/[0.04]"
             >
               <template v-for="feature in category.children" :key="feature.path">
                 <button
+                  type="button"
+                  :aria-expanded="feature.children.length ? isExpanded(feature.path) : undefined"
+                  :aria-controls="feature.children.length ? `feat-panel-${feature.path.replace(/\//g, '-')}` : undefined"
                   class="flex w-full items-center gap-3 px-5 py-3 pl-12 text-left transition hover:bg-white/[0.03]"
                   :class="{
                     'bg-white/[0.04]': selectedNode?.path === feature.path,
@@ -381,7 +388,10 @@ const stats = computed(() => {
                 </button>
 
                 <!-- Sub-features -->
-                <template v-if="feature.children.length && isExpanded(feature.path)">
+                <div
+                  v-if="feature.children.length && isExpanded(feature.path)"
+                  :id="`feat-panel-${feature.path.replace(/\//g, '-')}`"
+                >
                   <button
                     v-for="sub in feature.children"
                     :key="sub.path"
@@ -401,7 +411,7 @@ const stats = computed(() => {
                       {{ getStatusConfig(sub.status)!.label }}
                     </span>
                   </button>
-                </template>
+                </div>
               </template>
             </div>
           </div>
