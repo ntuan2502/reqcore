@@ -6,6 +6,22 @@ import * as schema from '../database/schema'
 type Auth = ReturnType<typeof betterAuth>
 let _auth: Auth | undefined
 
+function resolveTrustedOrigins(baseUrl: string): string[] {
+  const configuredOrigins = env.BETTER_AUTH_TRUSTED_ORIGINS
+  const baseOrigin = new URL(baseUrl)
+  const isLocalBase = baseOrigin.hostname === 'localhost' || baseOrigin.hostname === '127.0.0.1'
+  const defaultDevOrigins = (import.meta.dev || isLocalBase)
+    ? [
+        'http://localhost:3000',
+        'http://localhost:3001',
+        'http://127.0.0.1:3000',
+        'http://127.0.0.1:3001',
+      ]
+    : []
+
+  return Array.from(new Set([baseOrigin.origin, ...configuredOrigins, ...defaultDevOrigins]))
+}
+
 function resolveBetterAuthUrl(): string {
   const explicitUrl = env.BETTER_AUTH_URL?.trim()
   const railwayDomain = env.RAILWAY_PUBLIC_DOMAIN?.trim()
@@ -53,8 +69,11 @@ function resolveBetterAuthUrl(): string {
  */
 function getAuth(): Auth {
   if (!_auth) {
+    const baseURL = resolveBetterAuthUrl()
+
     _auth = betterAuth({
-      baseURL: resolveBetterAuthUrl(),
+      baseURL,
+      trustedOrigins: resolveTrustedOrigins(baseURL),
       database: drizzleAdapter(db, {
         provider: 'pg',
         schema,
