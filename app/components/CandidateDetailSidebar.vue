@@ -18,6 +18,16 @@ const emit = defineEmits<{
 
 const { handlePreviewReadOnlyError } = usePreviewReadOnly()
 
+// Detect if the job sub-nav bar is visible (adds 40px / 2.5rem)
+const route = useRoute()
+const getRouteBaseName = useRouteBaseName()
+const hasSubNav = computed(() => {
+  const baseName = getRouteBaseName(route)
+  if (typeof baseName !== 'string') return false
+  const idParam = route.params.id
+  return baseName.startsWith('dashboard-jobs-id') && typeof idParam === 'string' && idParam !== 'new'
+})
+
 // ─────────────────────────────────────────────
 // Tabs
 // ─────────────────────────────────────────────
@@ -296,7 +306,8 @@ const responsesCount = computed(() => application.value?.responses?.length ?? 0)
   <Transition name="slide">
     <aside
       v-if="open"
-      class="fixed top-0 right-0 z-40 h-full w-[640px] max-w-[calc(100vw-4rem)] border-l border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 shadow-xl flex flex-col"
+      class="fixed right-0 z-40 w-[640px] max-w-[calc(100vw-4rem)] border-l border-surface-200 dark:border-surface-800 bg-white dark:bg-surface-900 shadow-xl flex flex-col"
+      :class="hasSubNav ? 'top-24 h-[calc(100vh-6rem)]' : 'top-14 h-[calc(100vh-3.5rem)]'"
     >
       <!-- Header -->
       <div class="flex items-center justify-between border-b border-surface-200 dark:border-surface-800 px-6 py-4 shrink-0">

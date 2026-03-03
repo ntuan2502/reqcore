@@ -8,11 +8,11 @@ definePageMeta({
 </script>
 
 <template>
-  <div class="flex min-w-0 flex-1 -mx-6 -my-8">
-    <div class="sticky -top-8 h-screen shrink-0">
+  <div class="flex min-w-0 flex-1 -mx-4 -my-6 sm:-mx-6 lg:-mx-8 lg:-my-8">
+    <div class="sticky top-14 h-[calc(100vh-3.5rem)] shrink-0">
       <SettingsSidebar />
     </div>
-    <div class="flex-1 min-w-0 px-8 py-8">
+    <div class="flex-1 min-w-0 px-6 py-6 lg:px-8 lg:py-8">
       <NuxtErrorBoundary>
         <NuxtPage />
 
