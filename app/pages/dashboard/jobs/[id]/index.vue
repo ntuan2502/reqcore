@@ -100,8 +100,48 @@ watch(focusStatus, () => {
 
 const currentSummary = computed(() => filteredApplications.value[currentIndex.value] ?? null)
 
-// Detail tab for center panel
+// Detail tab for center panel (used for scroll-to-section navigation)
 const detailTab = ref<'overview' | 'documents' | 'responses'>('overview')
+
+// Section refs for scroll-to navigation
+const overviewRef = ref<HTMLElement | null>(null)
+const documentsRef = ref<HTMLElement | null>(null)
+const responsesRef = ref<HTMLElement | null>(null)
+const detailScrollContainer = ref<HTMLElement | null>(null)
+
+function scrollToSection(section: 'overview' | 'documents' | 'responses') {
+  detailTab.value = section
+  const refs: Record<string, ReturnType<typeof ref<HTMLElement | null>>> = {
+    overview: overviewRef,
+    documents: documentsRef,
+    responses: responsesRef,
+  }
+  const el = refs[section]?.value
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+}
+
+function handleDetailScroll() {
+  const container = detailScrollContainer.value
+  if (!container) return
+  const scrollTop = container.scrollTop
+  const offset = 120 // offset to trigger slightly before section top
+
+  const sections = [
+    { id: 'responses' as const, el: responsesRef.value },
+    { id: 'documents' as const, el: documentsRef.value },
+    { id: 'overview' as const, el: overviewRef.value },
+  ]
+
+  for (const section of sections) {
+    if (section.el && section.el.offsetTop - container.offsetTop <= scrollTop + offset) {
+      detailTab.value = section.id
+      return
+    }
+  }
+  detailTab.value = 'overview'
+}
 
 type SwipeDocument = {
   id: string
@@ -881,15 +921,15 @@ const isLoading = computed(() => {
               </div>
             </div>
 
-            <!-- Detail tabs -->
-            <div class="shrink-0 border-b border-surface-200/80 bg-white px-6 dark:border-surface-800/60 dark:bg-surface-900">
+            <!-- Detail tabs (scroll-to-section navigation) -->
+            <div class="sticky top-0 z-10 shrink-0 border-b border-surface-200/80 bg-white px-6 dark:border-surface-800/60 dark:bg-surface-900">
               <div class="mx-auto max-w-4xl flex gap-1 -mb-px">
                 <button
                   class="cursor-pointer px-3.5 py-2.5 text-sm font-medium transition-all duration-150 border-b-2"
                   :class="detailTab === 'overview'
                     ? 'border-brand-600 text-brand-700 dark:border-brand-400 dark:text-brand-300'
                     : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300 dark:text-surface-400 dark:hover:text-surface-300 dark:hover:border-surface-600'"
-                  @click="detailTab = 'overview'"
+                  @click="scrollToSection('overview')"
                 >
                   Profile
                 </button>
@@ -898,7 +938,7 @@ const isLoading = computed(() => {
                   :class="detailTab === 'documents'
                     ? 'border-brand-600 text-brand-700 dark:border-brand-400 dark:text-brand-300'
                     : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300 dark:text-surface-400 dark:hover:text-surface-300 dark:hover:border-surface-600'"
-                  @click="detailTab = 'documents'"
+                  @click="scrollToSection('documents')"
                 >
                   Documents
                   <span
@@ -914,22 +954,24 @@ const isLoading = computed(() => {
                   :class="detailTab === 'responses'
                     ? 'border-brand-600 text-brand-700 dark:border-brand-400 dark:text-brand-300'
                     : 'border-transparent text-surface-500 hover:text-surface-700 hover:border-surface-300 dark:text-surface-400 dark:hover:text-surface-300 dark:hover:border-surface-600'"
-                  @click="detailTab = 'responses'"
+                  @click="scrollToSection('responses')"
                 >
                   Responses ({{ resolvedCurrentApplication.responses.length }})
                 </button>
               </div>
             </div>
 
-            <!-- Detail content -->
-            <div class="flex-1 overflow-y-auto bg-surface-50/80 dark:bg-surface-950/80 px-6 py-8">
+            <!-- Detail content (all sections on one scrollable page) -->
+            <div ref="detailScrollContainer" class="flex-1 overflow-y-auto bg-surface-50/80 dark:bg-surface-950/80 px-6 py-8" @scroll="handleDetailScroll">
               <div v-if="detailFetchStatus === 'pending' && !resolvedCurrentApplication" class="flex flex-col items-center justify-center py-12">
                 <div class="size-8 rounded-full border-2 border-brand-200 border-t-brand-600 dark:border-brand-800 dark:border-t-brand-400 animate-spin" />
                 <p class="mt-3 text-sm text-surface-400">Loading details…</p>
               </div>
 
-              <!-- PROFILE TAB -->
-              <div v-else-if="detailTab === 'overview'" class="space-y-5 max-w-4xl mx-auto">
+              <template v-else>
+
+              <!-- PROFILE SECTION -->
+              <div ref="overviewRef" class="space-y-5 max-w-4xl mx-auto scroll-mt-4">
                 <!-- Candidate info -->
                 <div class="rounded-xl border border-surface-200/80 bg-white p-5 shadow-sm shadow-surface-900/[0.03] dark:border-surface-800/60 dark:bg-surface-900 dark:shadow-none">
                   <div class="flex items-center gap-2.5 mb-4">
@@ -1026,8 +1068,12 @@ const isLoading = computed(() => {
                 </div>
               </div>
 
-              <!-- DOCUMENTS TAB -->
-              <div v-else-if="detailTab === 'documents'" class="space-y-3 max-w-4xl mx-auto">
+              <!-- DOCUMENTS SECTION -->
+              <div ref="documentsRef" class="space-y-3 max-w-4xl mx-auto mt-10 scroll-mt-4">
+                <h2 class="text-sm font-semibold text-surface-800 dark:text-surface-200 flex items-center gap-2 mb-3">
+                  <Paperclip class="size-4 text-surface-400 dark:text-surface-500" />
+                  Documents
+                </h2>
                 <div v-if="resolvedCurrentApplication?.candidate.documents?.length" class="space-y-3">
                   <div
                     v-for="doc in resolvedCurrentApplication.candidate.documents"
@@ -1076,9 +1122,13 @@ const isLoading = computed(() => {
                 </div>
               </div>
 
-              <!-- RESPONSES TAB -->
-              <div v-else-if="detailTab === 'responses'" class="space-y-3 max-w-4xl mx-auto">
-                <div v-if="resolvedCurrentApplication?.responses?.length" class="space-y-3">
+              <!-- RESPONSES SECTION -->
+              <div v-if="resolvedCurrentApplication?.responses?.length" ref="responsesRef" class="space-y-3 max-w-4xl mx-auto mt-10 scroll-mt-4">
+                <h2 class="text-sm font-semibold text-surface-800 dark:text-surface-200 flex items-center gap-2 mb-3">
+                  <MessageSquare class="size-4 text-surface-400 dark:text-surface-500" />
+                  Responses
+                </h2>
+                <div class="space-y-3">
                   <div
                     v-for="response in resolvedCurrentApplication.responses"
                     :key="response.id"
@@ -1092,14 +1142,9 @@ const isLoading = computed(() => {
                     </p>
                   </div>
                 </div>
-                <div v-else class="rounded-xl border border-surface-200/80 bg-white p-10 text-center shadow-sm shadow-surface-900/[0.03] dark:border-surface-800/60 dark:bg-surface-900 dark:shadow-none">
-                  <div class="flex size-14 items-center justify-center rounded-2xl bg-surface-100 dark:bg-surface-800/60 mx-auto mb-3">
-                    <FileText class="size-6 text-surface-400 dark:text-surface-500" />
-                  </div>
-                  <p class="text-sm font-medium text-surface-600 dark:text-surface-300">No answered questions</p>
-                  <p class="mt-1 text-xs text-surface-400 dark:text-surface-500">Responses will appear here once submitted.</p>
-                </div>
               </div>
+
+              </template>
             </div>
           </template>
         </div>
